@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+const bcrypt = require('bcrypt');
+
 const prisma = require('../../utils/libs/prisma.config');
 
 async function main() {
@@ -6,7 +8,7 @@ async function main() {
     data: {
       nama: 'Admin',
       email: 'admin@gmail.com',
-      password: 'admin123',
+      password: await bcrypt.hash('admin123', 10),
     },
   });
   console.log(userData);

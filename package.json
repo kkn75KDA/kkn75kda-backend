@@ -1,0 +1,31 @@
+{
+    "name": "kkn75kda-backend",
+    "version": "1.0.0",
+    "description": "Backend for Website Desa",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon ./src/app.js"
+    },
+    "prisma": {
+        "schema": "./src/prisma/schema.prisma"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "eslint": "^8.45.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-plugin-import": "^2.25.2",
+        "morgan": "^1.10.0"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "express-rate-limit": "^6.7.1",
+        "jsonwebtoken": "^9.0.1",
+        "prisma": "^5.0.0"
+    }
+}

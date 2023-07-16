@@ -9,9 +9,78 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(30)
+  nama      String   @db.VarChar(30)
   email     String   @unique
   password  String   @db.VarChar(20)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model Pekerjaan {
+  id       Int        @id @default(autoincrement())
+  nama     String     @db.VarChar(30)
+  Penduduk Penduduk[]
+}
+
+model Pendidikan {
+  id       Int        @id @default(autoincrement())
+  nama     String     @db.VarChar(30)
+  Penduduk Penduduk[]
+}
+
+model Penduduk {
+  nik           String          @id @unique
+  no_kk         String
+  nama          String          @db.VarChar(30)
+  gender        Gender
+  tempat_lahir  String
+  tanggal_lahir String
+  alamat        String          @db.Text
+  rt            String          @db.VarChar(3)
+  rw            String          @db.VarChar(3)
+  desa          String
+  kecamatan     String
+  no_hp         String          @db.VarChar(13)
+  agama         String
+  pendidikan_id Int
+  pendidikan    Pendidikan      @relation(fields: [pendidikan_id], references: [id])
+  pekerjaan_id  Int
+  pekerjaan     Pekerjaan       @relation(fields: [pekerjaan_id], references: [id])
+  status        String
+  PerangkatDesa PerangkatDesa[]
+}
+
+enum Gender {
+  L
+  P
+}
+
+model Tag {
+  id      Int       @id
+  nama    String
+  Artikel Artikel[]
+}
+
+model Artikel {
+  id        Int    @id @default(autoincrement())
+  thumbnail String
+  judul     String
+  Isi       String @db.Text
+  tag_id    Int
+  tag       Tag    @relation(fields: [tag_id], references: [id])
+}
+
+model Jabatan {
+  id            Int             @id @default(autoincrement())
+  nama          String
+  PerangkatDesa PerangkatDesa[]
+}
+
+model PerangkatDesa {
+  id         Int      @id @default(autoincrement())
+  nik_id     String
+  nik        Penduduk @relation(fields: [nik_id], references: [nik])
+  photo      String
+  jabatan_id Int
+  jabatan    Jabatan  @relation(fields: [jabatan_id], references: [id])
 }

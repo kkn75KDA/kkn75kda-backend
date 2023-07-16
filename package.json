@@ -7,7 +7,7 @@
         "dev": "nodemon ./src/app.js",
         "start": "node ./src/app.js",
         "migrate": "npx prisma db push",
-        "seed": "node ./src/prisma/seeders/user.seeder.js"
+        "seed": "node ./src/prisma/seeders"
     },
     "prisma": {
         "schema": "./src/prisma/schema.prisma"

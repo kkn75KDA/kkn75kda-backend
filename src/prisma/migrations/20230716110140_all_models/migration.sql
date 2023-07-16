@@ -6,7 +6,7 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "nama" VARCHAR(30) NOT NULL,
     "email" TEXT NOT NULL,
-    "password" VARCHAR(20) NOT NULL,
+    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const prisma = require('../../utils/libs/prisma.config');
 
 const pekerjaan = require('./data/pekerjaan.json');
+const pendidikan = require('./data/pendidikan.json');
+const jabatan = require('./data/jabatan.json');
 
 async function main() {
   const hashPassword = await bcrypt.hash('admin123', 10);
@@ -15,6 +17,8 @@ async function main() {
 
   await prisma.user.create({ data: userData, skipDuplicates: true });
   await prisma.pekerjaan.createMany({ data: pekerjaan, skipDuplicates: true });
+  await prisma.pendidikan.createMany({ data: pendidikan, skipDuplicates: true });
+  await prisma.jabatan.createMany({ data: jabatan, skipDuplicates: true });
 }
 
 main()

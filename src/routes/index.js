@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const authRouter = require('./auth.route');
+const pekerjaanRouter = require('./pekerjaan.route');
 
 // eslint-disable-next-line arrow-body-style
 router.get('/', (req, res) => {
@@ -11,5 +12,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/auth', authRouter);
+router.use('/pekerjaan', pekerjaanRouter);
 
 module.exports = router;

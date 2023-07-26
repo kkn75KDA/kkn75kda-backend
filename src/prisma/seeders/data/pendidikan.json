@@ -1,5 +1,8 @@
 [
   {
+    "nama": "Tidak Sekolah"
+  },
+  {
     "nama": "Paud"
   },
   {
@@ -12,10 +15,7 @@
     "nama": "SMP/MTS"
   },
   {
-    "nama": "SMA/MA"
-  },
-  {
-    "nama": "SMK"
+    "nama": "SMA/MA/SMK"
   },
   {
     "nama": "Perguruan Tinggi"

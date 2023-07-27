@@ -2,6 +2,6 @@ const router = require('express').Router();
 
 const pekerjaanController = require('../controllers/pekerjaan.controller');
 
-router.post('/', pekerjaanController.addPekerjaan);
+router.get('/', pekerjaanController.getAll);
 
 module.exports = router;

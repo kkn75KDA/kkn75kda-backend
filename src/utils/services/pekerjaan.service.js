@@ -1,19 +1,9 @@
 const prisma = require('../libs/prisma.config');
 
-const pekerjaanValidationSchema = require('../validations/pekerjaan.schema');
-
 module.exports = {
-  createPekerjaan: async (pekerjaan) => {
-    const { error, value } = await pekerjaanValidationSchema.validate(pekerjaan);
+  getAllPekerjaan: async () => {
+    const pekerjaan = await prisma.pekerjaan.findMany();
 
-    if (error) {
-      return {
-        status: false,
-        message: error.details[0].message,
-      };
-    }
-    const addPekerjaan = prisma.pekerjaan.create({ data: value });
-
-    return addPekerjaan;
+    return pekerjaan;
   },
 };

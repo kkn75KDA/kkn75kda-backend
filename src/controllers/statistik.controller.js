@@ -18,7 +18,7 @@ module.exports = {
           return res.status(200).json({
             status: true,
             message: 'success',
-            data: ages,
+            data: { ages },
           });
 
         case 'pendidikan':
@@ -27,7 +27,7 @@ module.exports = {
           return res.status(200).json({
             status: true,
             message: 'success',
-            data: educations,
+            data: { educations },
           });
 
         case 'gender':
@@ -36,7 +36,7 @@ module.exports = {
           return res.status(200).json({
             status: true,
             message: 'success',
-            data: genders,
+            data: { genders },
           });
         case 'pekerjaan':
           const jobs = await statPekerjaan();
@@ -44,7 +44,7 @@ module.exports = {
           return res.status(200).json({
             status: true,
             message: 'success',
-            data: jobs,
+            data: { jobs },
           });
         default:
           next();

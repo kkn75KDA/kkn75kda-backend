@@ -3,23 +3,15 @@ const perangkatDesaValidationSchema = require('../validations/perangkatDesa.sche
 
 module.exports = {
   getAllPerangkatDesa: async () => {
-    const perangkatDesa = await prisma.perangkatDesa.findMany({
-      select: {
-        id: true,
-        nik: {
-          select: {
-            nik: true,
-            nama: true,
-          },
-        },
-        photo: true,
-        jabatan: {
-          select: {
-            nama: true,
-          },
-        },
-      },
-    });
+    const perangkatDesa = await prisma.$queryRaw`
+    SELECT 
+      pd.id, p."namaLengkap", 
+      pd.photo, 
+      j.nama as jabatan
+    FROM "PerangkatDesa" pd 
+    INNER JOIN "Penduduk" p ON pd.nik_id = p.nik 
+    INNER JOIN "Jabatan" j ON pd.jabatan_id = j.id 
+    `;
 
     return perangkatDesa;
   },

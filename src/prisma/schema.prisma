@@ -64,7 +64,7 @@ model Penghasilan {
 }
 
 model KartuKeluarga {
-  no_kk     String      @id
+  no_kk     String      @id @unique
   nik       Penduduk    @relation(fields: [nik_id], references: [nik])
   nik_id    String
   DataAsset DataAsset[]

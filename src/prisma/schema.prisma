@@ -67,6 +67,9 @@ model KartuKeluarga {
   no_kk     String      @id @unique
   nik       Penduduk    @relation(fields: [nik_id], references: [nik])
   nik_id    String
+  rt        String      @db.VarChar(3)
+  rw        String      @db.VarChar(3)
+  dusun     String      @db.VarChar(300)
   DataAsset DataAsset[]
 }
 
@@ -108,4 +111,12 @@ model PerangkatDesa {
   photo      String
   jabatan_id Int
   jabatan    Jabatan  @relation(fields: [jabatan_id], references: [id])
+}
+
+model Agenda {
+  id      Int      @id @default(autoincrement())
+  judul   String   @db.VarChar(50)
+  tempat  String   @db.VarChar(50)
+  tanggal DateTime @db.Date
+  waktu   DateTime @db.Time()
 }

@@ -65,7 +65,7 @@ model Penghasilan {
 
 model KartuKeluarga {
   no_kk     String      @id @unique
-  nik       Penduduk    @relation(fields: [nik_id], references: [nik])
+  nik       Penduduk    @relation(fields: [nik_id], references: [nik], onDelete: Cascade, onUpdate: Cascade)
   nik_id    String
   rt        String      @db.VarChar(3)
   rw        String      @db.VarChar(3)
@@ -75,10 +75,11 @@ model KartuKeluarga {
 
 model DataAsset {
   id             Int           @id @default(autoincrement())
-  no_kk          KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk])
+  no_kk          KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
   no_kk_id       String
   asset          Asset         @relation(fields: [asset_id], references: [id])
   asset_id       Int
+  jumlah         Int
   penghasilan    Penghasilan   @relation(fields: [penghasilan_id], references: [id])
   penghasilan_id Int
 }

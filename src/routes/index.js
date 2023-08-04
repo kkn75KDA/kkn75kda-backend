@@ -3,6 +3,7 @@ const router = require('express').Router();
 const authRouter = require('./auth.route');
 const assetRouter = require('./asset.route');
 const pekerjaanRouter = require('./pekerjaan.route');
+const pendudukRouter = require('./penduduk.route');
 const perangkatDesaRouter = require('./perangkatDesa.route');
 const statistikRouter = require('./statistik.route');
 
@@ -17,6 +18,7 @@ router.get('/', (req, res) => {
 router.use('/auth', authRouter);
 router.use('/asset', assetRouter);
 router.use('/pekerjaan', pekerjaanRouter);
+router.use('/penduduk', pendudukRouter);
 router.use('/perangkat-desa', perangkatDesaRouter);
 router.use('/statistik', statistikRouter);
 

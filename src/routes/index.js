@@ -6,6 +6,7 @@ const pekerjaanRouter = require('./pekerjaan.route');
 const pendudukRouter = require('./penduduk.route');
 const perangkatDesaRouter = require('./perangkatDesa.route');
 const statistikRouter = require('./statistik.route');
+const tagRouter = require('./tag.route');
 
 // eslint-disable-next-line arrow-body-style
 router.get('/', (req, res) => {
@@ -21,5 +22,6 @@ router.use('/pekerjaan', pekerjaanRouter);
 router.use('/penduduk', pendudukRouter);
 router.use('/perangkat-desa', perangkatDesaRouter);
 router.use('/statistik', statistikRouter);
+router.use('/tag', tagRouter);
 
 module.exports = router;

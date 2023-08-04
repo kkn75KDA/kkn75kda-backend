@@ -1,21 +1,21 @@
 const {
-  getAllTag,
-  getTagById,
-  createTag,
-  updateTag,
-  deleteTag,
-} = require('../utils/services/tag.service');
-const { createTagSchema, updateTagSchema } = require('../utils/validations/tag.schema');
+  getAllArtikel,
+  getArtikelbyId,
+  createArtikel,
+  updateArtikel,
+  deleteArtikel,
+} = require('../utils/services/artikel.service');
+const { createArtikelSchema, updateArtikelSchema } = require('../utils/validations/artikel.schema');
 
 module.exports = {
   getAll: async (req, res, next) => {
     try {
-      const tags = await getAllTag();
+      const artikels = await getAllArtikel();
 
       return res.status(200).json({
         status: true,
         message: 'success',
-        data: { tags },
+        data: { artikels },
       });
     } catch (error) {
       next(error);
@@ -27,19 +27,19 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const tag = await getTagById(id);
+      const artikel = await getArtikelbyId(id);
 
-      if (!tag) {
+      if (artikel.status === false) {
         return res.status(404).json({
           status: false,
-          message: `Tag with id ${id} not exist!`,
+          message: artikel.message,
         });
       }
 
       return res.status(200).json({
         status: true,
         message: 'success',
-        data: { tag },
+        data: { artikel },
       });
     } catch (error) {
       next(error);
@@ -49,7 +49,7 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const { error, value } = createTagSchema.validate(req.body);
+      const { error, value } = createArtikelSchema.validate(req.body);
 
       if (error) {
         return res.status(400).json({
@@ -58,25 +58,23 @@ module.exports = {
         });
       }
 
-      const tag = await createTag(value);
+      const artikel = await createArtikel(value);
 
       return res.status(201).json({
         status: true,
         message: 'success',
-        data: { tag },
+        data: { artikel },
       });
     } catch (error) {
       next(error);
     }
-
     return null;
   },
 
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
-
-      const { error, value } = updateTagSchema.validate(req.body);
+      const { error, value } = updateArtikelSchema.validate(req.body);
 
       if (error) {
         return res.status(400).json({
@@ -85,20 +83,18 @@ module.exports = {
         });
       }
 
-      const findTag = await getTagById(id);
+      const artikel = await updateArtikel(id, value);
 
-      if (!findTag) {
+      if (artikel.status === false) {
         return res.status(404).json({
           status: false,
-          message: `Tag with id ${id} not exist!`,
+          message: artikel.message,
         });
       }
 
-      await updateTag(id, value);
-
       return res.status(200).json({
         status: true,
-        message: `Tag with ${id} updated!`,
+        message: `Artikel with id ${id} updated!`,
       });
     } catch (error) {
       next(error);
@@ -110,25 +106,22 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const findTag = await getTagById(id);
+      const artikel = await deleteArtikel(id);
 
-      if (!findTag) {
+      if (artikel.status === false) {
         return res.status(404).json({
           status: false,
-          message: `Tag with id ${id} not exist!`,
+          message: artikel.message,
         });
       }
 
-      await deleteTag(id);
-
       return res.status(200).json({
         status: true,
-        message: `Tag with id ${id} deleted!`,
+        message: `artikel with id ${id} deleted!`,
       });
     } catch (error) {
       next(error);
     }
-
     return null;
   },
 };

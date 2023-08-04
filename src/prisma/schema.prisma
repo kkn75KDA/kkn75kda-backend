@@ -91,12 +91,14 @@ model Tag {
 }
 
 model Artikel {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   thumbnail String
-  judul     String @db.VarChar(40)
-  Isi       String @db.Text
+  judul     String   @db.VarChar(40)
+  isi       String   @db.Text
   tag_id    Int
-  tag       Tag    @relation(fields: [tag_id], references: [id])
+  tag       Tag      @relation(fields: [tag_id], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
 }
 
 model Jabatan {

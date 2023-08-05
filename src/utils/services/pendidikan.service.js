@@ -20,12 +20,8 @@ module.exports = {
     return pendidikan;
   },
 
-  getPedidikanByNama: async (namaPendidikan) => {
-    const pendidikan = await prisma.$queryRaw`
-    SELECT *
-    FROM "Pendidikan" p
-        WHERE p.nama = ${namaPendidikan}
-    `;
+  getPedidikanByName: async (namaPendidikan) => {
+    const pendidikan = await prisma.pendidikan.findUnique({ where: { nama: namaPendidikan } });
 
     return pendidikan;
   },

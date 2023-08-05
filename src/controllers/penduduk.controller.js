@@ -1,9 +1,16 @@
+const path = require('path');
 const {
   getAllPenduduk,
   getPendudukByKK,
   createPenduduk,
+  importPenduduk,
+  updatePenduduk,
+  deletePenduduk,
 } = require('../utils/services/penduduk.service');
-const { createPendudukSchema } = require('../utils/validations/penduduk.schema');
+const {
+  createPendudukSchema,
+  updatePendudukSchema,
+} = require('../utils/validations/penduduk.schema');
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -62,6 +69,75 @@ module.exports = {
         status: true,
         message: 'success',
         data: { resident },
+      });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  update: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { error, value } = updatePendudukSchema.validate(req.body);
+
+      if (error) {
+        return res.status(400).json({
+          status: false,
+          message: error.details[0].message,
+        });
+      }
+
+      const penduduk = await updatePenduduk(id, value);
+
+      if (penduduk.status === false) {
+        return res.status(404).json({
+          status: false,
+          message: penduduk.message,
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: `Penduduk with NIK ${id} updated!`,
+      });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  delete: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const penduduk = await deletePenduduk(id);
+
+      if (penduduk.status === false) {
+        return res.status(404).json({
+          status: false,
+          message: penduduk.message,
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: `Penduduk with NIK ${id} deleted!`,
+      });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  importCsv: async (req, res, next) => {
+    try {
+      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
+      await importPenduduk(fileUrl);
+
+      return res.status(200).json({
+        status: true,
+        message: 'Import data penduduk success!',
       });
     } catch (error) {
       next(error);

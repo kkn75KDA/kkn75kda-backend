@@ -6,4 +6,10 @@ module.exports = {
 
     return pekerjaan;
   },
+
+  getPekerjaanByName: async (namaPekerjaan) => {
+    const pekerjaan = await prisma.pekerjaan.findUnique({ where: { nama: namaPekerjaan } });
+
+    return pekerjaan;
+  },
 };

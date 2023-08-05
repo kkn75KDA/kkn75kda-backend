@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const createPendudukSchema = Joi.object({
+  no_kk_id: Joi.string().required(),
   namaLengkap: Joi.string().required(),
   nik: Joi.string().required(),
   gender: Joi.string().required(),
@@ -32,9 +33,20 @@ const createPendudukSchema = Joi.object({
       'string.length': 'RW must be between {#limit} characters long',
       'any.required': 'RW is required',
     }),
+  no_hp: Joi.string()
+    .pattern(/^[0-9]{10,13}$/)
+    .optional()
+    .messages({
+      'string.base': 'Phone number must be a string',
+      'string.empty': 'Phone number cannot be empty',
+      'string.pattern.base': 'Phone number must consist of digits only',
+      'string.length': 'Phone number must be between {#limit} characters long',
+      'any.required': 'Phone number is required',
+    }),
 });
 
 const updatePendudukSchema = Joi.object({
+  no_kk_id: Joi.string().optional(),
   namaLengkap: Joi.string().optional(),
   nik: Joi.string().optional(),
   gender: Joi.string().optional(),
@@ -46,8 +58,36 @@ const updatePendudukSchema = Joi.object({
   status: Joi.string().optional(),
   no_kk: Joi.string().optional(),
   dusun: Joi.string().optional(),
-  rt: Joi.string().min(3).max(3).optional(),
-  rw: Joi.string().min(3).max(3).optional(),
+  rt: Joi.string()
+    .pattern(/^[0-9]{3}$/)
+    .optional()
+    .messages({
+      'string.base': 'RT must be a string',
+      'string.empty': 'RT cannot be empty',
+      'string.pattern.base': 'RT must consist of digits only',
+      'string.length': 'RT must be between {#limit} characters long',
+      'any.required': 'RT is required',
+    }),
+  rw: Joi.string()
+    .pattern(/^[0-9]{3}$/)
+    .optional()
+    .messages({
+      'string.base': 'RW must be a string',
+      'string.empty': 'RW cannot be empty',
+      'string.pattern.base': 'RW must consist of digits only',
+      'string.length': 'RW must be between {#limit} characters long',
+      'any.required': 'RW is required',
+    }),
+  no_hp: Joi.string()
+    .pattern(/^[0-9]{10,13}$/)
+    .optional()
+    .messages({
+      'string.base': 'Phone number must be a string',
+      'string.empty': 'Phone number cannot be empty',
+      'string.pattern.base': 'Phone number must consist of digits only',
+      'string.length': 'Phone number must be between {#limit} characters long',
+      'any.required': 'Phone number is required',
+    }),
 });
 
 module.exports = { createPendudukSchema, updatePendudukSchema };

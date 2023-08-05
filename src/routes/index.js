@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const agendaRouter = require('./agenda.schema');
 const authRouter = require('./auth.route');
 const artikelRouter = require('./artikel.route');
 const assetRouter = require('./asset.route');
@@ -17,6 +18,7 @@ router.get('/', (req, res) => {
   });
 });
 
+router.use('/agenda', agendaRouter);
 router.use('/auth', authRouter);
 router.use('/artikel', artikelRouter);
 router.use('/asset', assetRouter);

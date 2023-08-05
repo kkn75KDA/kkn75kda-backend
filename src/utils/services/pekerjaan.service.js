@@ -7,12 +7,8 @@ module.exports = {
     return pekerjaan;
   },
 
-  findPekerjaanByName: async (namaPekerjaan) => {
-    const pekerjaan = await prisma.$queryRaw`
-    SELECT *
-    FROM "Pekerjaan" p
-      WHERE p.nama = ${namaPekerjaan}
-    `;
+  getPekerjaanByName: async (namaPekerjaan) => {
+    const pekerjaan = await prisma.pekerjaan.findUnique({ where: { nama: namaPekerjaan } });
 
     return pekerjaan;
   },

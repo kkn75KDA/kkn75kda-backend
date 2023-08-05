@@ -30,8 +30,10 @@ model Pendidikan {
 }
 
 model Penduduk {
-  nik           String          @id @unique
+  no_kk         KartuKeluarga   @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
+  no_kk_id      String
   namaLengkap   String          @db.VarChar(30)
+  nik           String          @id @unique
   gender        Gender
   tempat_lahir  String          @db.VarChar(30)
   tanggal_lahir String
@@ -43,7 +45,6 @@ model Penduduk {
   pekerjaan     Pekerjaan       @relation(fields: [pekerjaan_id], references: [id])
   status        String
   PerangkatDesa PerangkatDesa[]
-  KartuKeluarga KartuKeluarga[]
 }
 
 enum Gender {
@@ -64,13 +65,13 @@ model Penghasilan {
 }
 
 model KartuKeluarga {
-  no_kk     String      @id @unique
-  nik       Penduduk    @relation(fields: [nik_id], references: [nik], onDelete: Cascade, onUpdate: Cascade)
-  nik_id    String
-  rt        String      @db.VarChar(3)
-  rw        String      @db.VarChar(3)
-  dusun     String      @db.VarChar(300)
-  DataAsset DataAsset[]
+  no_kk       String      @id @unique
+  rt          String      @db.VarChar(3)
+  rw          String      @db.VarChar(3)
+  dusun       String      @db.VarChar(300)
+  DataAsset   DataAsset[]
+  pendudukNik String?
+  Penduduk    Penduduk[]
 }
 
 model DataAsset {

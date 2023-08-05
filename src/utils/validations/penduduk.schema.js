@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const createPendudukSchema = Joi.object({
+  no_kk_id: Joi.string().required(),
   namaLengkap: Joi.string().required(),
   nik: Joi.string().required(),
   gender: Joi.string().required(),
@@ -45,6 +46,7 @@ const createPendudukSchema = Joi.object({
 });
 
 const updatePendudukSchema = Joi.object({
+  no_kk_id: Joi.string().optional(),
   namaLengkap: Joi.string().optional(),
   nik: Joi.string().optional(),
   gender: Joi.string().optional(),

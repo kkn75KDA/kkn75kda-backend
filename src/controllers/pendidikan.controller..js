@@ -1,26 +1,24 @@
-const path = require('path');
 const {
-  getAllPenduduk,
-  getPendudukByKK,
-  createPenduduk,
-  importPenduduk,
-  updatePenduduk,
-  deletePenduduk,
-} = require('../utils/services/penduduk.service');
+  getAllPendidikan,
+  getPedidikanById,
+  createPendidikan,
+  updatePendidikan,
+  deletePendidikan,
+} = require('../utils/services/pendidikan.service');
 const {
-  createPendudukSchema,
-  updatePendudukSchema,
-} = require('../utils/validations/penduduk.schema');
+  createPendidikanSchema,
+  updatePendidikanSchema,
+} = require('../utils/validations/pendidikan.schema');
 
 module.exports = {
   getAll: async (req, res, next) => {
     try {
-      const residents = await getAllPenduduk();
+      const pendidikan = await getAllPendidikan();
 
       return res.status(200).json({
         status: true,
         message: 'success',
-        data: { residents },
+        data: { pendidikan },
       });
     } catch (error) {
       next(error);
@@ -28,23 +26,23 @@ module.exports = {
     return null;
   },
 
-  getByKK: async (req, res, next) => {
+  getById: async (req, res, next) => {
     try {
-      const { noKK } = req.params;
+      const { id } = req.params;
 
-      const resident = await getPendudukByKK(noKK);
+      const pendidikan = await getPedidikanById(id);
 
-      if (!resident) {
-        return res.status(204).json({
+      if (pendidikan.status === false) {
+        return res.status(404).json({
           status: false,
-          message: `Penduduk with no.kk ${noKK} isn't exist!`,
+          message: pendidikan.message,
         });
       }
 
       return res.status(200).json({
         status: true,
         message: 'success',
-        data: { resident },
+        data: { pendidikan },
       });
     } catch (error) {
       next(error);
@@ -54,7 +52,7 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const { error, value } = createPendudukSchema.validate(req.body);
+      const { error, value } = createPendidikanSchema.validate(req.body);
 
       if (error) {
         return res.status(400).json({
@@ -63,12 +61,12 @@ module.exports = {
         });
       }
 
-      const resident = await createPenduduk(value);
+      const pendidikan = await createPendidikan(value);
 
       return res.status(201).json({
         status: true,
         message: 'success',
-        data: { resident },
+        data: { pendidikan },
       });
     } catch (error) {
       next(error);
@@ -79,7 +77,7 @@ module.exports = {
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { error, value } = updatePendudukSchema.validate(req.body);
+      const { error, value } = updatePendidikanSchema.validate(req.body);
 
       if (error) {
         return res.status(400).json({
@@ -88,18 +86,18 @@ module.exports = {
         });
       }
 
-      const penduduk = await updatePenduduk(id, value);
+      const pendidikan = await updatePendidikan(id, value);
 
-      if (penduduk.status === false) {
+      if (pendidikan.status === false) {
         return res.status(404).json({
           status: false,
-          message: penduduk.message,
+          message: pendidikan.message,
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: `Penduduk with NIK ${id} updated!`,
+        message: `Pendidikan with id ${id} updated!`,
       });
     } catch (error) {
       next(error);
@@ -111,33 +109,18 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const penduduk = await deletePenduduk(id);
+      const pendidikan = await deletePendidikan(id);
 
-      if (penduduk.status === false) {
+      if (pendidikan.status === false) {
         return res.status(404).json({
           status: false,
-          message: penduduk.message,
+          message: pendidikan.message,
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: `Penduduk with NIK ${id} deleted!`,
-      });
-    } catch (error) {
-      next(error);
-    }
-    return null;
-  },
-
-  importCsv: async (req, res, next) => {
-    try {
-      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
-      await importPenduduk(fileUrl);
-
-      return res.status(200).json({
-        status: true,
-        message: 'Import data penduduk success!',
+        message: `Pendidikan with id ${id} deleted!`,
       });
     } catch (error) {
       next(error);

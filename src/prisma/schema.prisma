@@ -34,7 +34,7 @@ model Penduduk {
   namaLengkap   String          @db.VarChar(30)
   gender        Gender
   tempat_lahir  String          @db.VarChar(30)
-  tanggal_lahir DateTime        @db.Date
+  tanggal_lahir String
   no_hp         String          @db.VarChar(13)
   agama         String          @db.VarChar(20)
   pendidikan_id Int

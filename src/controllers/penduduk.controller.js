@@ -1,7 +1,9 @@
+const path = require('path');
 const {
   getAllPenduduk,
   getPendudukByKK,
   createPenduduk,
+  importPenduduk,
 } = require('../utils/services/penduduk.service');
 const { createPendudukSchema } = require('../utils/validations/penduduk.schema');
 
@@ -67,5 +69,14 @@ module.exports = {
       next(error);
     }
     return null;
+  },
+
+  importCsv: async (req, res, next) => {
+    try {
+      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
+      const penduduk = await importPenduduk(fileUrl);
+    } catch (error) {
+      next(error);
+    }
   },
 };

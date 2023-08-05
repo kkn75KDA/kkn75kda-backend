@@ -1,4 +1,9 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable camelcase */
+const fs = require('fs');
+const path = require('path');
+const csv = require('fast-csv');
+
 const prisma = require('../libs/prisma.config');
 
 module.exports = {
@@ -69,6 +74,7 @@ module.exports = {
       dusun,
       rt,
       rw,
+      no_hp,
     } = data;
 
     const penduduk = await prisma.penduduk.create({
@@ -86,6 +92,7 @@ module.exports = {
         dusun,
         rt,
         rw,
+        no_hp,
       },
     });
 
@@ -99,5 +106,64 @@ module.exports = {
     });
 
     return { penduduk, kk };
+  },
+
+  importPenduduk: async (csvUrl) => {
+    const stream = fs.createReadStream(csvUrl);
+    const dataPenduduk = [];
+
+    csv
+      .parseStream(stream, { headers: true, delimiter: ',' })
+      .on('error', (err) => {
+        throw err;
+      })
+      .on('data', async (data) => {
+        try {
+          const findPendidikan = await prisma.$queryRaw`
+          SELECT *
+          FROM "Pendidikan" p
+          WHERE p.nama = ${data.pendidikan}
+          `;
+
+          const findPekerjaan = await prisma.$queryRaw`
+          SELECT *
+          FROM "Pekerjaan" p
+          WHERE p.nama = ${data.pekerjaan}
+          `;
+
+          if (!findPendidikan) {
+            const pendidikan = await prisma.pendidikan.create({ data: { nama: data.pendidikan } });
+            if (!findPekerjaan) {
+              const pekerjaan = await prisma.pekerjaan.create({ data: { nama: data.pekerjaan } });
+            }
+          }
+
+          if (!findPekerjaan) {
+            const pekerjaan = await prisma.pekerjaan.create({ data: { nama: data.pekerjaan } });
+          }
+
+          await prisma.penduduk.createMany({
+            data: {
+              namaLengkap: data.namaLengkap,
+              nik: data.nik,
+              gender: data.gender,
+              tempat_lahir: data.tempat_lahir,
+              tanggal_lahir: data.tanggal_lahir,
+              agama: data.agama,
+              pendidikan_id: findPendidikan.id,
+              pekerjaan_id: data.pekerjaan_id,
+              no_hp: data.no_hp,
+            },
+          });
+        } catch (error) {
+          throw error;
+        }
+      })
+      .on('end', () => {
+        console.log(dataPenduduk);
+      });
+    // fs.unlink(csvUrl, (err) => {
+    //   if (err) throw err;
+    // });
   },
 };

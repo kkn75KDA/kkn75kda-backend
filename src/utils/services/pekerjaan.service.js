@@ -6,4 +6,14 @@ module.exports = {
 
     return pekerjaan;
   },
+
+  findPekerjaanByName: async (namaPekerjaan) => {
+    const pekerjaan = await prisma.$queryRaw`
+    SELECT *
+    FROM "Pekerjaan" p
+      WHERE p.nama = ${namaPekerjaan}
+    `;
+
+    return pekerjaan;
+  },
 };

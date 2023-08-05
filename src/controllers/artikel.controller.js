@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 const {
   getAllArtikel,
   getArtikelbyId,
@@ -49,6 +50,7 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
+      req.body.thumbnail = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
       const { error, value } = createArtikelSchema.validate(req.body);
 
       if (error) {
@@ -74,6 +76,7 @@ module.exports = {
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
+      req.body.thumbnail = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
       const { error, value } = updateArtikelSchema.validate(req.body);
 
       if (error) {

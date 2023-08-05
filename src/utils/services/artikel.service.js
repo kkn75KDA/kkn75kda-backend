@@ -1,4 +1,7 @@
 /* eslint-disable camelcase */
+const fs = require('fs');
+const url = require('url');
+
 const prisma = require('../libs/prisma.config');
 
 module.exports = {
@@ -74,11 +77,19 @@ module.exports = {
         },
         where: { id: parseInt(id, 10) },
       });
+      const parse = url.parse(findArtikel.thumbnail);
+      fs.unlink(`uploads/${parse.pathname}`, (err) => {
+        if (err) throw err;
+      });
 
       return artikel;
     }
 
     const artikel = await prisma.artikel.update({ where: { id: parseInt(id, 10) }, data });
+    const parse = url.parse(findArtikel.thumbnail);
+    fs.unlink(`uploads/${parse.pathname}`, (err) => {
+      if (err) throw err;
+    });
 
     return artikel;
   },
@@ -94,6 +105,10 @@ module.exports = {
     }
 
     const artikel = await prisma.artikel.delete({ where: { id: parseInt(id, 10) } });
+    const parse = url.parse(findArtikel.thumbnail);
+    fs.unlink(`uploads/${parse.pathname}`, (err) => {
+      if (err) throw err;
+    });
 
     return artikel;
   },

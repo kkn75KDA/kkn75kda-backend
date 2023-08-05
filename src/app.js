@@ -27,6 +27,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieparser());
+app.use('/images', express.static('uploads/images'));
 
 if (NODE_ENV === 'dev') {
   app.use(morgan('dev'));

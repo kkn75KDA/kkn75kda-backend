@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
 const fs = require('fs');
 const url = require('url');
+const { Prisma } = require('@prisma/client');
 
 const prisma = require('../libs/prisma.config');
+const { getTagByName, createTag } = require('./tag.service');
 
 module.exports = {
   getAllArtikel: async () => {
@@ -15,65 +17,68 @@ module.exports = {
     const artikel = await prisma.artikel.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!artikel) {
-      return {
-        status: false,
-        message: `Artikel with id ${id} not exist!`,
-      };
+      return { status: false, message: `Artikel with id ${id} not exist!` };
     }
 
     return artikel;
   },
 
   createArtikel: async (data) => {
-    const { thumbnail, judul, isi, tag_id, newTag } = data;
+    const { thumbnail, judul, isi, tag } = data;
 
-    const findTag = await prisma.$queryRaw`
-    SELECT * 
-    FROM "Tag" t 
-    WHERE t.nama = ${newTag}
-    `;
+    try {
+      const findTag = await getTagByName(tag);
 
-    if (!findTag) {
-      const tag = await prisma.tag.create({ data: { nama: newTag } });
+      if (!findTag) {
+        const newTag = await createTag(tag);
+
+        const artikel = await prisma.artikel.create({
+          data: { thumbnail, judul, isi, tag_id: newTag.id },
+        });
+
+        return artikel;
+      }
 
       const artikel = await prisma.artikel.create({
-        data: { thumbnail, judul, isi, tag_id: tag.id },
+        data: { thumbnail, judul, isi, tag_id: findTag.id },
       });
 
       return artikel;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const parse = url.parse(thumbnail);
+        fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          if (err) throw err;
+        });
+        return { status: false, code: error.code, meta: error.meta, message: error.message };
+      }
+      const parse = url.parse(thumbnail);
+      fs.unlink(`uploads/${parse.pathname}`, (err) => {
+        if (err) throw err;
+      });
+      throw error;
     }
-
-    const artikel = await prisma.artikel.create({ data: { thumbnail, judul, isi, tag_id } });
-
-    return artikel;
   },
 
   updateArtikel: async (id, data) => {
-    const { thumbnail, judul, isi, newTag } = data;
+    const { thumbnail, judul, isi, tag } = data;
 
     const findArtikel = await prisma.artikel.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!findArtikel) {
-      return {
-        status: false,
-        message: `Artikel with id ${id} not exist!`,
-      };
+      return { status: false, message: `Artikel with id ${id} not exist!` };
     }
 
-    const findTag = await prisma.$queryRaw`
-    SELECT * 
-    FROM "Tag" t 
-    WHERE t.nama = ${newTag}
-    `;
+    const findTag = await getTagByName(tag);
 
     if (!findTag) {
-      const tag = await prisma.tag.create({ data: { nama: newTag } });
+      const newTag = await createTag(tag);
       const artikel = await prisma.artikel.update({
         data: {
           thumbnail: thumbnail || findArtikel.thumbnail,
           judul: judul || findArtikel.judul,
-          isi: isi || findArtikel.Isi,
-          tag_id: tag.id || findArtikel.tag_id,
+          isi: isi || findArtikel.isi,
+          tag_id: newTag.id,
         },
         where: { id: parseInt(id, 10) },
       });
@@ -85,7 +90,16 @@ module.exports = {
       return artikel;
     }
 
-    const artikel = await prisma.artikel.update({ where: { id: parseInt(id, 10) }, data });
+    const artikel = await prisma.artikel.update({
+      where: { id: parseInt(id, 10) },
+      data: {
+        thumbnail: thumbnail || findArtikel.thumbnail,
+        judul: judul || findArtikel.judul,
+        isi: isi || findArtikel.isi,
+        tag_id: findArtikel.tag_id,
+      },
+    });
+
     const parse = url.parse(findArtikel.thumbnail);
     fs.unlink(`uploads/${parse.pathname}`, (err) => {
       if (err) throw err;
@@ -98,10 +112,7 @@ module.exports = {
     const findArtikel = await prisma.artikel.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!findArtikel) {
-      return {
-        status: false,
-        message: `Artikel with id ${id} not exist!`,
-      };
+      return { status: false, message: `Artikel with id ${id} not exist!` };
     }
 
     const artikel = await prisma.artikel.delete({ where: { id: parseInt(id, 10) } });

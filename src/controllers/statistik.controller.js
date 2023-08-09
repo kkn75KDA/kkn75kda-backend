@@ -15,37 +15,21 @@ module.exports = {
         case 'umur':
           const ages = await statAge();
 
-          return res.status(200).json({
-            status: true,
-            message: 'success',
-            data: { ages },
-          });
+          return res.status(200).json({ status: true, message: 'success', data: { ages } });
 
         case 'pendidikan':
           const educations = await statEducation();
 
-          return res.status(200).json({
-            status: true,
-            message: 'success',
-            data: { educations },
-          });
+          return res.status(200).json({ status: true, message: 'success', data: { educations } });
 
         case 'gender':
           const genders = await statGender();
 
-          return res.status(200).json({
-            status: true,
-            message: 'success',
-            data: { genders },
-          });
+          return res.status(200).json({ status: true, message: 'success', data: { genders } });
         case 'pekerjaan':
           const jobs = await statPekerjaan();
 
-          return res.status(200).json({
-            status: true,
-            message: 'success',
-            data: { jobs },
-          });
+          return res.status(200).json({ status: true, message: 'success', data: { jobs } });
         default:
           next();
       }

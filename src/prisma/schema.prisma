@@ -11,7 +11,7 @@ model User {
   id        Int      @id @default(autoincrement())
   nama      String   @db.VarChar(30)
   email     String   @unique
-  password  String   @db.VarChar(20)
+  password  String
   avatar    String   @default("https://ik.imagekit.io/qlxmzsojb/KKN75/user.png?updatedAt=1690285305263")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -19,13 +19,13 @@ model User {
 
 model Pekerjaan {
   id       Int        @id @default(autoincrement())
-  nama     String     @db.VarChar(30)
+  nama     String     @unique @db.VarChar(30)
   Penduduk Penduduk[]
 }
 
 model Pendidikan {
   id       Int        @id @default(autoincrement())
-  nama     String     @db.VarChar(30)
+  nama     String     @unique @db.VarChar(30)
   Penduduk Penduduk[]
 }
 
@@ -53,15 +53,9 @@ enum Gender {
 }
 
 model Asset {
-  id         Int         @id @default(autoincrement())
-  nama_asset String      @db.VarChar(50)
-  DataAsset  DataAsset[]
-}
-
-model Penghasilan {
-  id          Int         @id @default(autoincrement())
-  penghasilan Int
-  DataAsset   DataAsset[]
+  id        Int         @id @default(autoincrement())
+  nama      String      @unique @db.VarChar(50)
+  DataAsset DataAsset[]
 }
 
 model KartuKeluarga {
@@ -75,19 +69,18 @@ model KartuKeluarga {
 }
 
 model DataAsset {
-  id             Int           @id @default(autoincrement())
-  no_kk          KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
-  no_kk_id       String
-  asset          Asset         @relation(fields: [asset_id], references: [id])
-  asset_id       Int
-  jumlah         Int
-  penghasilan    Penghasilan   @relation(fields: [penghasilan_id], references: [id])
-  penghasilan_id Int
+  id          Int           @id @default(autoincrement())
+  no_kk       KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
+  no_kk_id    String
+  asset       Asset         @relation(fields: [asset_id], references: [id])
+  asset_id    Int
+  jumlah      String        @db.VarChar(30)
+  penghasilan String
 }
 
 model Tag {
   id      Int       @id @default(autoincrement())
-  nama    String    @db.VarChar(30)
+  nama    String    @unique @db.VarChar(30)
   Artikel Artikel[]
 }
 
@@ -102,19 +95,12 @@ model Artikel {
   updatedAt DateTime @default(now()) @db.Timestamp()
 }
 
-model Jabatan {
-  id            Int             @id @default(autoincrement())
-  nama          String          @db.VarChar(40)
-  PerangkatDesa PerangkatDesa[]
-}
-
 model PerangkatDesa {
-  id         Int      @id @default(autoincrement())
-  nik_id     String
-  nik        Penduduk @relation(fields: [nik_id], references: [nik])
-  photo      String
-  jabatan_id Int
-  jabatan    Jabatan  @relation(fields: [jabatan_id], references: [id])
+  id      Int      @id @default(autoincrement())
+  nik_id  String
+  nik     Penduduk @relation(fields: [nik_id], references: [nik])
+  photo   String
+  jabatan String   @db.VarChar(30)
 }
 
 model Agenda {

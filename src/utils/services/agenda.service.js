@@ -7,30 +7,10 @@ module.exports = {
     return agenda;
   },
 
-  getAgendaById: async (id) => {
-    const agenda = await prisma.agenda.findUnique({ where: { id: parseInt(id, 10) } });
-
-    if (!agenda) {
-      return {
-        status: false,
-        message: `Agenda with id ${id} not exist!`,
-      };
-    }
-
-    return agenda;
-  },
-
   createAgenda: async (data) => {
     const { judul, tempat, tanggal, waktu } = data;
 
-    const agenda = await prisma.agenda.create({
-      data: {
-        judul,
-        tempat,
-        tanggal,
-        waktu,
-      },
-    });
+    const agenda = await prisma.agenda.create({ data: { judul, tempat, tanggal, waktu } });
 
     return agenda;
   },
@@ -39,10 +19,7 @@ module.exports = {
     const findAgenda = await prisma.agenda.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!findAgenda) {
-      return {
-        status: false,
-        message: `Agenda with id ${id} not exist!`,
-      };
+      return { status: false, message: `Agenda with id ${id} not exist!` };
     }
 
     const agenda = await prisma.agenda.update({ where: { id: parseInt(id, 10) }, data });
@@ -54,10 +31,7 @@ module.exports = {
     const findAgenda = await prisma.agenda.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!findAgenda) {
-      return {
-        status: false,
-        message: `Agenda with id ${id} not exist!`,
-      };
+      return { status: false, message: `Agenda with id ${id} not exist!` };
     }
 
     const agenda = await prisma.agenda.delete({ where: { id: parseInt(id, 10) } });

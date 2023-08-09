@@ -1,11 +1,7 @@
 const Joi = require('joi');
 
-const createPendidikanSchema = Joi.object({
+const pendidikanSchema = Joi.object({
   nama: Joi.string().required(),
 });
 
-const updatePendidikanSchema = Joi.object({
-  nama: Joi.string().optional(),
-});
-
-module.exports = { createPendidikanSchema, updatePendidikanSchema };
+module.exports = pendidikanSchema;

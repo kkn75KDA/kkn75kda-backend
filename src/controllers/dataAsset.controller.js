@@ -18,11 +18,7 @@ module.exports = {
     try {
       const assets = await getAllDataAsset();
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { assets },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { assets } });
     } catch (error) {
       next(error);
     }
@@ -36,17 +32,10 @@ module.exports = {
       const dataAsset = await getDataAssetByKK(id);
 
       if (dataAsset.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: dataAsset.message,
-        });
+        return res.status(404).json({ status: false, message: dataAsset.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { dataAsset },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { dataAsset } });
     } catch (error) {
       next(error);
     }
@@ -58,19 +47,12 @@ module.exports = {
       const { error, value } = createDataAssetSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const dataAsset = await createDataAsset(value);
 
-      return res.status(201).json({
-        status: true,
-        message: 'success',
-        data: { dataAsset },
-      });
+      return res.status(201).json({ status: true, message: 'success', data: { dataAsset } });
     } catch (error) {
       next(error);
     }
@@ -83,25 +65,18 @@ module.exports = {
       const { error, value } = updateDataAssetSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const dataAsset = await updateDataAsset(id, value);
 
       if (dataAsset.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: dataAsset.message,
-        });
+        return res.status(404).json({ status: false, message: dataAsset.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `Asset Data with no.kk ${id} updated!`,
-      });
+      return res
+        .status(200)
+        .json({ status: true, message: `Asset Data with no.kk ${id} updated!` });
     } catch (error) {
       next(error);
     }
@@ -115,16 +90,12 @@ module.exports = {
       const dataAsset = await deleteDataAsset(id);
 
       if (dataAsset.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: dataAsset.message,
-        });
+        return res.status(404).json({ status: false, message: dataAsset.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `Asset data with no.kk ${id} deleted!`,
-      });
+      return res
+        .status(200)
+        .json({ status: true, message: `Asset data with no.kk ${id} deleted!` });
     } catch (error) {
       next(error);
     }
@@ -133,13 +104,18 @@ module.exports = {
 
   importCsv: async (req, res, next) => {
     try {
-      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
-      await importCsv(fileUrl);
+      if (!req.file.filename) {
+        return res.status(400).json({ status: false, message: 'File asset is required!' });
+      }
 
-      return res.status(201).json({
-        status: true,
-        message: 'Import data asset success!',
-      });
+      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
+      const importDataAsset = await importCsv(fileUrl);
+
+      if (importDataAsset.status === false) {
+        return res.status(400).json({ status: false, message: importDataAsset.message });
+      }
+
+      return res.status(201).json({ status: true, message: 'Import data asset success!' });
     } catch (error) {
       next(error);
     }

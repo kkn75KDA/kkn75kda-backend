@@ -1,11 +1,7 @@
 const Joi = require('joi');
 
-const createTagSchema = Joi.object({
+const tagSchema = Joi.object({
   nama: Joi.string().required(),
 });
 
-const updateTagSchema = Joi.object({
-  nama: Joi.string().required(),
-});
-
-module.exports = { createTagSchema, updateTagSchema };
+module.exports = tagSchema;

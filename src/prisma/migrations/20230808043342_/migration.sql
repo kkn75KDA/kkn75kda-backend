@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "DataAsset" ALTER COLUMN "jumlah" SET DATA TYPE VARCHAR(30);

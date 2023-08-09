@@ -13,11 +13,7 @@ module.exports = {
     try {
       const artikels = await getAllArtikel();
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { artikels },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { artikels } });
     } catch (error) {
       next(error);
     }
@@ -31,17 +27,10 @@ module.exports = {
       const artikel = await getArtikelbyId(id);
 
       if (artikel.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: artikel.message,
-        });
+        return res.status(404).json({ status: false, message: artikel.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { artikel },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { artikel } });
     } catch (error) {
       next(error);
     }
@@ -54,19 +43,12 @@ module.exports = {
       const { error, value } = createArtikelSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const artikel = await createArtikel(value);
 
-      return res.status(201).json({
-        status: true,
-        message: 'success',
-        data: { artikel },
-      });
+      return res.status(201).json({ status: true, message: 'success', data: { artikel } });
     } catch (error) {
       next(error);
     }
@@ -80,25 +62,16 @@ module.exports = {
       const { error, value } = updateArtikelSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const artikel = await updateArtikel(id, value);
 
       if (artikel.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: artikel.message,
-        });
+        return res.status(404).json({ status: false, message: artikel.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `Artikel with id ${id} updated!`,
-      });
+      return res.status(200).json({ status: true, message: `Artikel with id ${id} updated!` });
     } catch (error) {
       next(error);
     }
@@ -112,16 +85,10 @@ module.exports = {
       const artikel = await deleteArtikel(id);
 
       if (artikel.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: artikel.message,
-        });
+        return res.status(404).json({ status: false, message: artikel.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `artikel with id ${id} deleted!`,
-      });
+      return res.status(200).json({ status: true, message: `artikel with id ${id} deleted!` });
     } catch (error) {
       next(error);
     }

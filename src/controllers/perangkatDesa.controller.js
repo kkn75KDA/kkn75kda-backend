@@ -1,34 +1,83 @@
 const {
   getAllPerangkatDesa,
+  createPerangkatDesa,
   updatePerangkatDesa,
+  deletePerangkat,
 } = require('../utils/services/perangkatDesa.service');
+
+const {
+  createPerangkatDesaSchema,
+  updatePerangkatDesaSchema,
+} = require('../utils/validations/perangkatDesa.schema');
 
 module.exports = {
   getAll: async (req, res, next) => {
     try {
       const perangkatDesa = await getAllPerangkatDesa();
 
-      return res.status(200).json({
-        status: true,
-        message: 'success!',
-        data: { perangkatDesa },
-      });
+      return res.status(200).json({ status: true, message: 'success!', data: { perangkatDesa } });
     } catch (error) {
       next(error);
     }
     return null;
   },
 
-  updatePerangkat: async (req, res, next) => {
+  create: async (req, res, next) => {
+    try {
+      req.body.photo = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      const { error, value } = createPerangkatDesaSchema.validate(req.body);
+
+      if (error) {
+        return { status: false, message: error.details[0].message };
+      }
+
+      const perangkat = await createPerangkatDesa(value);
+
+      return res.status(201).json({ status: true, message: 'success', data: perangkat });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  update: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      req.body.photo = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      const { error, value } = updatePerangkatDesaSchema.validate(req.body);
+
+      if (error) {
+        return { status: false, message: error.details[0].message };
+      }
+
+      const perangkat = await updatePerangkatDesa(value, id);
+
+      if (perangkat.status === false) {
+        return res.status(404).json({ status: false, message: perangkat.message });
+      }
+
+      return res
+        .status(200)
+        .json({ status: true, message: `Success update perangkat desa dengan id ${id} !` });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  delete: async (req, res, next) => {
     try {
       const { id } = req.params;
 
-      await updatePerangkatDesa(req.body, id);
+      const perangkat = await deletePerangkat(id);
 
-      return res.status(200).json({
-        status: true,
-        message: `Success update perangkat desa dengan id ${id} !`,
-      });
+      if (perangkat.status === false) {
+        return res.status(404).json({ status: false, message: perangkat.message });
+      }
+
+      return res
+        .status(200)
+        .json({ status: true, message: `Perangkat desa with id ${id} deleted!` });
     } catch (error) {
       next(error);
     }

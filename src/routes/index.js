@@ -1,9 +1,10 @@
 const router = require('express').Router();
 
-const agendaRouter = require('./agenda.schema');
+const agendaRouter = require('./agenda.route');
 const authRouter = require('./auth.route');
 const artikelRouter = require('./artikel.route');
 const assetRouter = require('./asset.route');
+const dataAssetRouter = require('./dataAsset.route');
 const pekerjaanRouter = require('./pekerjaan.route');
 const pendidikanRouter = require('./pendidikan.route');
 const pendudukRouter = require('./penduduk.route');
@@ -23,6 +24,7 @@ router.use('/agenda', agendaRouter);
 router.use('/auth', authRouter);
 router.use('/artikel', artikelRouter);
 router.use('/asset', assetRouter);
+router.use('/data-asset', dataAssetRouter);
 router.use('/pekerjaan', pekerjaanRouter);
 router.use('/pendidikan', pendidikanRouter);
 router.use('/penduduk', pendudukRouter);

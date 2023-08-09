@@ -1,29 +1,29 @@
 [
   {
-    "nama_asset": "Sepeda Motor"
+    "nama": "Sepeda Motor"
   },
   {
-    "nama_asset": "Mobil"
+    "nama": "Mobil"
   },
   {
-    "nama_asset": "Tanah"
+    "nama": "Tanah"
   },
   {
-    "nama_asset": "Rumah"
+    "nama": "Rumah"
   },
   {
-    "nama_asset": "Ternak Ayam"
+    "nama": "Ternak Ayam"
   },
   {
-    "nama_asset": "Ternak Kambing"
+    "nama": "Ternak Kambing"
   },
   {
-    "nama_asset": "Ternak Sapi"
+    "nama": "Ternak Sapi"
   },
   {
-    "nama_asset": "Ternak Bebek"
+    "nama": "Ternak Bebek"
   },
   {
-    "nama_asset": "Sawah"
+    "nama": "Sawah"
   }
 ]

@@ -1,46 +1,12 @@
-const {
-  getAllTag,
-  getTagById,
-  createTag,
-  updateTag,
-  deleteTag,
-} = require('../utils/services/tag.service');
-const { createTagSchema, updateTagSchema } = require('../utils/validations/tag.schema');
+const { getAllTag, createTag, updateTag, deleteTag } = require('../utils/services/tag.service');
+const tagSchema = require('../utils/validations/tag.schema');
 
 module.exports = {
   getAll: async (req, res, next) => {
     try {
       const tags = await getAllTag();
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { tags },
-      });
-    } catch (error) {
-      next(error);
-    }
-    return null;
-  },
-
-  getById: async (req, res, next) => {
-    try {
-      const { id } = req.params;
-
-      const tag = await getTagById(id);
-
-      if (!tag) {
-        return res.status(404).json({
-          status: false,
-          message: `Tag with id ${id} not exist!`,
-        });
-      }
-
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { tag },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { tags } });
     } catch (error) {
       next(error);
     }
@@ -49,22 +15,15 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      const { error, value } = createTagSchema.validate(req.body);
+      const { error, value } = tagSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const tag = await createTag(value);
 
-      return res.status(201).json({
-        status: true,
-        message: 'success',
-        data: { tag },
-      });
+      return res.status(201).json({ status: true, message: 'success', data: { tag } });
     } catch (error) {
       next(error);
     }
@@ -76,30 +35,19 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const { error, value } = updateTagSchema.validate(req.body);
+      const { error, value } = tagSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
-      const findTag = await getTagById(id);
+      const tag = await updateTag(id, value);
 
-      if (!findTag) {
-        return res.status(404).json({
-          status: false,
-          message: `Tag with id ${id} not exist!`,
-        });
+      if (tag.status === false) {
+        return res.status(404).json({ status: false, message: tag.message });
       }
 
-      await updateTag(id, value);
-
-      return res.status(200).json({
-        status: true,
-        message: `Tag with ${id} updated!`,
-      });
+      return res.status(200).json({ status: true, message: `Tag with ${id} updated!` });
     } catch (error) {
       next(error);
     }
@@ -110,21 +58,13 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const findTag = await getTagById(id);
+      const tag = await deleteTag(id);
 
-      if (!findTag) {
-        return res.status(404).json({
-          status: false,
-          message: `Tag with id ${id} not exist!`,
-        });
+      if (tag.status === false) {
+        return res.status(404).json({ status: false, message: tag.message });
       }
 
-      await deleteTag(id);
-
-      return res.status(200).json({
-        status: true,
-        message: `Tag with id ${id} deleted!`,
-      });
+      return res.status(200).json({ status: true, message: `Tag with id ${id} deleted!` });
     } catch (error) {
       next(error);
     }

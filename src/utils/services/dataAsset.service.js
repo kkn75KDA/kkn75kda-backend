@@ -2,10 +2,13 @@
 /* eslint-disable no-useless-catch */
 const fs = require('fs');
 const csv = require('fast-csv');
+const url = require('url');
+const { Prisma } = require('@prisma/client');
 
 const prisma = require('../libs/prisma.config');
 
 const { getAssetByName, createAsset } = require('./asset.service');
+const { importDataAssetSchema } = require('../validations/dataAsset.schema');
 
 module.exports = {
   getAllDataAsset: async () => {
@@ -130,7 +133,13 @@ module.exports = {
       })
       .on('data', async (data) => {
         try {
-          const { no_kk, asset, jumlah, penghasilan } = data;
+          const { error, value } = importDataAssetSchema.validate(data);
+
+          if (error) {
+            return { status: false, message: error.details[0].message };
+          }
+
+          const { no_kk, asset, jumlah, penghasilan } = value;
 
           const findAsset = await getAssetByName(asset);
 
@@ -138,12 +147,7 @@ module.exports = {
             const newAsset = await createAsset(asset);
 
             const dataAsset = await prisma.dataAsset.createMany({
-              data: {
-                no_kk_id: no_kk,
-                asset_id: newAsset.id,
-                jumlah,
-                penghasilan,
-              },
+              data: { no_kk_id: no_kk, asset_id: newAsset.id, jumlah, penghasilan },
               skipDuplicates: true,
             });
 
@@ -162,6 +166,17 @@ module.exports = {
 
           return dataAsset;
         } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            const parse = url.parse(csvUrl);
+            fs.unlink(`uploads/${parse.pathname}`, (err) => {
+              if (err) throw err;
+            });
+            return { status: false, code: error.code, meta: error.meta, message: error.message };
+          }
+          const parse = url.parse(csvUrl);
+          fs.unlink(`uploads/${parse.pathname}`, (err) => {
+            if (err) throw err;
+          });
           throw error;
         }
       })

@@ -17,11 +17,7 @@ module.exports = {
     try {
       const residents = await getAllPenduduk();
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { residents },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { residents } });
     } catch (error) {
       next(error);
     }
@@ -35,17 +31,12 @@ module.exports = {
       const resident = await getPendudukByKK(noKK);
 
       if (!resident) {
-        return res.status(204).json({
-          status: false,
-          message: `Penduduk with no.kk ${noKK} isn't exist!`,
-        });
+        return res
+          .status(204)
+          .json({ status: false, message: `Penduduk with no.kk ${noKK} isn't exist!` });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: 'success',
-        data: { resident },
-      });
+      return res.status(200).json({ status: true, message: 'success', data: { resident } });
     } catch (error) {
       next(error);
     }
@@ -57,19 +48,12 @@ module.exports = {
       const { error, value } = createPendudukSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const resident = await createPenduduk(value);
 
-      return res.status(201).json({
-        status: true,
-        message: 'success',
-        data: { resident },
-      });
+      return res.status(201).json({ status: true, message: 'success', data: { resident } });
     } catch (error) {
       next(error);
     }
@@ -82,25 +66,16 @@ module.exports = {
       const { error, value } = updatePendudukSchema.validate(req.body);
 
       if (error) {
-        return res.status(400).json({
-          status: false,
-          message: error.details[0].message,
-        });
+        return res.status(400).json({ status: false, message: error.details[0].message });
       }
 
       const penduduk = await updatePenduduk(id, value);
 
       if (penduduk.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: penduduk.message,
-        });
+        return res.status(404).json({ status: false, message: penduduk.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `Penduduk with NIK ${id} updated!`,
-      });
+      return res.status(200).json({ status: true, message: `Penduduk with NIK ${id} updated!` });
     } catch (error) {
       next(error);
     }
@@ -114,16 +89,10 @@ module.exports = {
       const penduduk = await deletePenduduk(id);
 
       if (penduduk.status === false) {
-        return res.status(404).json({
-          status: false,
-          message: penduduk.message,
-        });
+        return res.status(404).json({ status: false, message: penduduk.message });
       }
 
-      return res.status(200).json({
-        status: true,
-        message: `Penduduk with NIK ${id} deleted!`,
-      });
+      return res.status(200).json({ status: true, message: `Penduduk with NIK ${id} deleted!` });
     } catch (error) {
       next(error);
     }
@@ -132,13 +101,18 @@ module.exports = {
 
   importCsv: async (req, res, next) => {
     try {
-      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
-      await importPenduduk(fileUrl);
+      if (!req.file.filename) {
+        return res.status(400).json({ status: false, message: 'File asset is required!' });
+      }
 
-      return res.status(200).json({
-        status: true,
-        message: 'Import data penduduk success!',
-      });
+      const fileUrl = path.join('uploads/penduduk/', req.file.filename);
+      const penduduk = await importPenduduk(fileUrl);
+
+      if (penduduk.status === false) {
+        return res.status(400).json({ status: false, message: penduduk.message });
+      }
+
+      return res.status(200).json({ status: true, message: 'Import data penduduk success!' });
     } catch (error) {
       next(error);
     }

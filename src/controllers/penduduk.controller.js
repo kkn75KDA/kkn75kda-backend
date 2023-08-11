@@ -106,11 +106,7 @@ module.exports = {
       }
 
       const fileUrl = path.join('uploads/penduduk/', req.file.filename);
-      const penduduk = await importPenduduk(fileUrl);
-
-      if (penduduk.status === false) {
-        return res.status(400).json({ status: false, message: penduduk.message });
-      }
+      await importPenduduk(fileUrl);
 
       return res.status(200).json({ status: true, message: 'Import data penduduk success!' });
     } catch (error) {

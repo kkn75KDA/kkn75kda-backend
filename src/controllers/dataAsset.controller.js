@@ -109,11 +109,7 @@ module.exports = {
       }
 
       const fileUrl = path.join('uploads/penduduk/', req.file.filename);
-      const importDataAsset = await importCsv(fileUrl);
-
-      if (importDataAsset.status === false) {
-        return res.status(400).json({ status: false, message: importDataAsset.message });
-      }
+      await importCsv(fileUrl);
 
       return res.status(201).json({ status: true, message: 'Import data asset success!' });
     } catch (error) {

@@ -8,7 +8,6 @@ const { Prisma } = require('@prisma/client');
 const prisma = require('../libs/prisma.config');
 
 const { getAssetByName, createAsset } = require('./asset.service');
-const { importDataAssetSchema } = require('../validations/dataAsset.schema');
 
 module.exports = {
   getAllDataAsset: async () => {
@@ -69,17 +68,14 @@ module.exports = {
   updateDataAsset: async (id, data) => {
     const { asset, jumlah, penghasilan } = data;
 
-    const findDataAsset = await prisma.dataAsset.findUnique({ where: { no_kk_id: id } });
-    const findAsset = await prisma.asset.findUnique({ where: { nama: asset } });
+    const findDataAsset = await prisma.dataAsset.findFirst({ where: { no_kk_id: id } });
+    const findAsset = await prisma.asset.findFirst({ where: { nama: asset } });
 
     if (!findDataAsset) {
-      return {
-        status: false,
-        message: `Asset data with no.KK ${id} not exist!`,
-      };
+      return { status: false, message: `Asset data with no.KK ${id} not exist!` };
     }
 
-    if (!asset) {
+    if (!findAsset) {
       const newAsset = await prisma.asset.create({ data: { nama: asset } });
 
       const dataAsset = await prisma.dataAsset.update({
@@ -112,10 +108,7 @@ module.exports = {
     const findDataAsset = await prisma.dataAsset.findUnique({ where: { id } });
 
     if (!findDataAsset) {
-      return {
-        status: false,
-        message: `Asset data with id ${id} not exist!`,
-      };
+      return { status: false, message: `Asset data with id ${id} not exist!` };
     }
 
     const dataAsset = await prisma.dataAsset.delete({ where: { no_kk_id: id } });
@@ -133,13 +126,7 @@ module.exports = {
       })
       .on('data', async (data) => {
         try {
-          const { error, value } = importDataAssetSchema.validate(data);
-
-          if (error) {
-            return { status: false, message: error.details[0].message };
-          }
-
-          const { no_kk, asset, jumlah, penghasilan } = value;
+          const { no_kk, asset, jumlah, penghasilan } = data;
 
           const findAsset = await getAssetByName(asset);
 

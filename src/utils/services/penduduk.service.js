@@ -6,9 +6,8 @@ const csv = require('fast-csv');
 const { Prisma } = require('@prisma/client');
 
 const prisma = require('../libs/prisma.config');
-const { getPedidikanByName } = require('./pendidikan.service');
-const { getPekerjaanByName } = require('./pekerjaan.service');
-const { importPendudukSchema } = require('../validations/penduduk.schema');
+const { getPedidikanByName, createPendidikan } = require('./pendidikan.service');
+const { getPekerjaanByName, createPekerjaan } = require('./pekerjaan.service');
 
 module.exports = {
   getAllPenduduk: async () => {
@@ -71,8 +70,8 @@ module.exports = {
       tempat_lahir,
       tanggal_lahir,
       agama,
-      pendidikan_id,
-      pekerjaan_id,
+      pendidikan,
+      pekerjaan,
       status,
       no_kk,
       dusun,
@@ -80,6 +79,82 @@ module.exports = {
       rw,
       no_hp,
     } = data;
+
+    const findPendidikan = await getPedidikanByName(pendidikan);
+    const findPekerjaan = await getPekerjaanByName(pekerjaan);
+
+    if (!findPendidikan && !findPekerjaan) {
+      const newPendidikan = await createPendidikan(pekerjaan);
+      const newPekerjaan = await createPekerjaan(pekerjaan);
+
+      const penduduk = await prisma.penduduk.create({
+        data: {
+          no_kk_id: no_kk,
+          namaLengkap,
+          nik,
+          gender,
+          tempat_lahir,
+          tanggal_lahir,
+          agama,
+          pendidikan_id: newPendidikan.id,
+          pekerjaan_id: newPekerjaan.id,
+          status,
+          no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
+
+      return { penduduk, kk };
+    }
+
+    if (!findPendidikan) {
+      const newPendidikan = await createPendidikan(pekerjaan);
+
+      const penduduk = await prisma.penduduk.create({
+        data: {
+          no_kk_id: no_kk,
+          namaLengkap,
+          nik,
+          gender,
+          tempat_lahir,
+          tanggal_lahir,
+          agama,
+          pendidikan_id: newPendidikan.id,
+          pekerjaan_id: findPekerjaan.id,
+          status,
+          no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
+
+      return { penduduk, kk };
+    }
+
+    if (!findPekerjaan) {
+      const newPekerjaan = await createPekerjaan(pekerjaan);
+
+      const penduduk = await prisma.penduduk.create({
+        data: {
+          no_kk_id: no_kk,
+          namaLengkap,
+          nik,
+          gender,
+          tempat_lahir,
+          tanggal_lahir,
+          agama,
+          pendidikan_id: findPendidikan.id,
+          pekerjaan_id: newPekerjaan.id,
+          status,
+          no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
+
+      return { penduduk, kk };
+    }
 
     const penduduk = await prisma.penduduk.create({
       data: {
@@ -90,8 +165,8 @@ module.exports = {
         tempat_lahir,
         tanggal_lahir,
         agama,
-        pendidikan_id,
-        pekerjaan_id,
+        pendidikan_id: findPendidikan.id,
+        pekerjaan_id: findPekerjaan.id,
         status,
         no_hp,
       },
@@ -99,7 +174,7 @@ module.exports = {
 
     const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
 
-    return [penduduk, kk];
+    return { penduduk, kk };
   },
 
   updatePenduduk: async (id, data) => {
@@ -110,8 +185,8 @@ module.exports = {
       tempat_lahir,
       tanggal_lahir,
       agama,
-      pendidikan_id,
-      pekerjaan_id,
+      pendidikan,
+      pekerjaan,
       status,
       no_kk,
       dusun,
@@ -133,6 +208,113 @@ module.exports = {
       where: { no_kk: findPenduduk.no_kk_id },
     });
 
+    if (!findKK) {
+      return { status: false, message: `Kartu Keluarga with no.KK ${findPenduduk.no_kk_id}` };
+    }
+
+    const findPendidikan = await getPedidikanByName(pendidikan);
+    const findPekerjaan = await getPekerjaanByName(pekerjaan);
+
+    if (!findPendidikan && !findPekerjaan) {
+      const newPendidikan = await createPendidikan(pendidikan);
+      const newPekerjaan = await createPekerjaan(pekerjaan);
+
+      const penduduk = await prisma.penduduk.update({
+        where: { nik: id },
+        data: {
+          no_kk_id: no_kk || findPenduduk.no_kk_id,
+          namaLengkap: namaLengkap || findPenduduk.namaLengkap,
+          nik: nik || findPenduduk.nik,
+          gender: gender || findPenduduk.gender,
+          tempat_lahir: tempat_lahir || findPenduduk.tempat_lahir,
+          tanggal_lahir: tanggal_lahir || findPenduduk.tanggal_lahir,
+          agama: agama || findPenduduk.agama,
+          pekerjaan_id: newPekerjaan.id || findPenduduk.pekerjaan_id,
+          pendidikan_id: newPendidikan.id || findPenduduk.pendidikan_id,
+          status: status || findPenduduk.status,
+          no_hp: no_hp || findPenduduk.no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.update({
+        where: { no_kk: findPenduduk.no_kk_id },
+        data: {
+          no_kk: no_kk || findKK.no_kk,
+          dusun: dusun || findKK.dusun,
+          rt: rt || findKK.rt,
+          rw: rw || findKK.rw,
+        },
+      });
+
+      return [penduduk, kk];
+    }
+
+    if (!findPekerjaan) {
+      const newPekerjaan = await createPekerjaan(pekerjaan);
+
+      const penduduk = await prisma.penduduk.update({
+        where: { nik: id },
+        data: {
+          no_kk_id: no_kk || findPenduduk.no_kk_id,
+          namaLengkap: namaLengkap || findPenduduk.namaLengkap,
+          nik: nik || findPenduduk.nik,
+          gender: gender || findPenduduk.gender,
+          tempat_lahir: tempat_lahir || findPenduduk.tempat_lahir,
+          tanggal_lahir: tanggal_lahir || findPenduduk.tanggal_lahir,
+          agama: agama || findPenduduk.agama,
+          pekerjaan_id: newPekerjaan.id || findPenduduk.pekerjaan_id,
+          pendidikan_id: findPendidikan.id || findPenduduk.pendidikan_id,
+          status: status || findPenduduk.status,
+          no_hp: no_hp || findPenduduk.no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.update({
+        where: { no_kk: findPenduduk.no_kk_id },
+        data: {
+          no_kk: no_kk || findKK.no_kk,
+          dusun: dusun || findKK.dusun,
+          rt: rt || findKK.rt,
+          rw: rw || findKK.rw,
+        },
+      });
+
+      return [penduduk, kk];
+    }
+
+    if (!findPendidikan) {
+      const newPendidikan = await createPendidikan(pendidikan);
+
+      const penduduk = await prisma.penduduk.update({
+        where: { nik: id },
+        data: {
+          no_kk_id: no_kk || findPenduduk.no_kk_id,
+          namaLengkap: namaLengkap || findPenduduk.namaLengkap,
+          nik: nik || findPenduduk.nik,
+          gender: gender || findPenduduk.gender,
+          tempat_lahir: tempat_lahir || findPenduduk.tempat_lahir,
+          tanggal_lahir: tanggal_lahir || findPenduduk.tanggal_lahir,
+          agama: agama || findPenduduk.agama,
+          pekerjaan_id: findPekerjaan.id || findPenduduk.pekerjaan_id,
+          pendidikan_id: newPendidikan.id || findPenduduk.pendidikan_id,
+          status: status || findPenduduk.status,
+          no_hp: no_hp || findPenduduk.no_hp,
+        },
+      });
+
+      const kk = await prisma.kartuKeluarga.update({
+        where: { no_kk: findPenduduk.no_kk_id },
+        data: {
+          no_kk: no_kk || findKK.no_kk,
+          dusun: dusun || findKK.dusun,
+          rt: rt || findKK.rt,
+          rw: rw || findKK.rw,
+        },
+      });
+
+      return [penduduk, kk];
+    }
+
     const penduduk = await prisma.penduduk.update({
       where: { nik: id },
       data: {
@@ -143,8 +325,8 @@ module.exports = {
         tempat_lahir: tempat_lahir || findPenduduk.tempat_lahir,
         tanggal_lahir: tanggal_lahir || findPenduduk.tanggal_lahir,
         agama: agama || findPenduduk.agama,
-        pekerjaan_id: pekerjaan_id || findPenduduk.pekerjaan_id,
-        pendidikan_id: pendidikan_id || findPenduduk.pendidikan_id,
+        pekerjaan_id: findPekerjaan.id || findPenduduk.pekerjaan_id,
+        pendidikan_id: findPendidikan.id || findPenduduk.pendidikan_id,
         status: status || findPenduduk.status,
         no_hp: no_hp || findPenduduk.no_hp,
       },
@@ -176,129 +358,95 @@ module.exports = {
   },
 
   importPenduduk: async (csvUrl) => {
-    try {
-      const stream = fs.createReadStream(csvUrl);
+    const stream = fs.createReadStream(csvUrl);
 
-      csv
-        .parseStream(stream, { headers: true, delimiter: ',' })
-        .on('error', (err) => {
-          throw err;
-        })
-        .on('data', async (data) => {
-          try {
-            const { error, value } = importPendudukSchema.validate(data);
+    csv
+      .parseStream(stream, { headers: true, delimiter: ',' })
+      .on('error', (err) => {
+        throw err;
+      })
+      .on('data', async (data) => {
+        try {
+          const {
+            namaLengkap,
+            nik,
+            gender,
+            tempat_lahir,
+            tanggal_lahir,
+            agama,
+            pendidikan,
+            pekerjaan,
+            status,
+            no_hp,
+            no_kk,
+            dusun,
+            rt,
+            rw,
+          } = data;
 
-            if (error) {
-              return { status: false, message: error.details[0].message };
-            }
+          const findPendidikan = await getPedidikanByName(pendidikan);
+          const findPekerjaan = await getPekerjaanByName(pekerjaan);
 
-            const {
-              namaLengkap,
-              nik,
-              gender,
-              tempat_lahir,
-              tanggal_lahir,
-              agama,
-              pendidikan,
-              pekerjaan,
-              status,
-              no_hp,
-              no_kk,
-              dusun,
-              rt,
-              rw,
-            } = value;
+          if (!findPendidikan && !findPekerjaan) {
+            const newPendidikan = await createPendidikan(pendidikan);
 
-            const findPendidikan = await getPedidikanByName(pendidikan);
-            const findPekerjaan = await getPekerjaanByName(pekerjaan);
+            const newPekerjaan = await createPekerjaan(pekerjaan);
 
-            if (!findPendidikan && !findPekerjaan) {
-              const newPendidikan = await prisma.pendidikan.create({
-                data: { nama: pendidikan },
-              });
+            const dataKK = await prisma.kartuKeluarga.createMany({
+              data: { no_kk, dusun, rt, rw },
+              skipDuplicates: true,
+            });
 
-              const newPekerjaan = await prisma.pekerjaan.create({ data: { nama: pekerjaan } });
+            const dataPenduduk = await prisma.penduduk.createMany({
+              data: {
+                no_kk_id: no_kk,
+                namaLengkap,
+                nik,
+                gender,
+                tempat_lahir,
+                tanggal_lahir,
+                agama,
+                pendidikan_id: newPendidikan.id,
+                pekerjaan_id: newPekerjaan.id,
+                status,
+                no_hp,
+              },
+              skipDuplicates: true,
+            });
 
-              const dataKK = await prisma.kartuKeluarga.createMany({
-                data: { no_kk, dusun, rt, rw },
-                skipDuplicates: true,
-              });
+            return [dataPenduduk, dataKK];
+          }
 
-              const dataPenduduk = await prisma.penduduk.createMany({
-                data: {
-                  no_kk_id: no_kk,
-                  namaLengkap,
-                  nik,
-                  gender,
-                  tempat_lahir,
-                  tanggal_lahir,
-                  agama,
-                  pendidikan_id: newPendidikan.id,
-                  pekerjaan_id: newPekerjaan.id,
-                  status,
-                  no_hp,
-                },
-                skipDuplicates: true,
-              });
+          if (!findPendidikan) {
+            const newPendidikan = await createPendidikan(pendidikan);
 
-              return [dataPenduduk, dataKK];
-            }
+            const dataKK = await prisma.kartuKeluarga.createMany({
+              data: { no_kk, dusun, rt, rw },
+              skipDuplicates: true,
+            });
 
-            if (!findPendidikan) {
-              const newPendidikan = await prisma.pendidikan.create({ data: { nama: pendidikan } });
+            const dataPenduduk = await prisma.penduduk.createMany({
+              data: {
+                no_kk_id: no_kk,
+                namaLengkap,
+                nik,
+                gender,
+                tempat_lahir,
+                tanggal_lahir,
+                agama,
+                pendidikan_id: newPendidikan.id,
+                pekerjaan_id: findPekerjaan.id,
+                status,
+                no_hp,
+              },
+              skipDuplicates: true,
+            });
 
-              const dataKK = await prisma.kartuKeluarga.createMany({
-                data: { no_kk, dusun, rt, rw },
-                skipDuplicates: true,
-              });
+            return { dataPenduduk, dataKK };
+          }
 
-              const dataPenduduk = await prisma.penduduk.createMany({
-                data: {
-                  no_kk_id: no_kk,
-                  namaLengkap,
-                  nik,
-                  gender,
-                  tempat_lahir,
-                  tanggal_lahir,
-                  agama,
-                  pendidikan_id: newPendidikan.id,
-                  pekerjaan_id: findPekerjaan.id,
-                  status,
-                  no_hp,
-                },
-                skipDuplicates: true,
-              });
-
-              return [dataPenduduk, dataKK];
-            }
-
-            if (!findPekerjaan) {
-              const newPekerjaan = await prisma.pekerjaan.create({ data: { nama: pekerjaan } });
-
-              const dataKK = await prisma.kartuKeluarga.createMany({
-                data: { no_kk, dusun, rt, rw },
-                skipDuplicates: true,
-              });
-
-              const dataPenduduk = await prisma.penduduk.createMany({
-                data: {
-                  no_kk_id: no_kk,
-                  namaLengkap,
-                  nik,
-                  gender,
-                  tempat_lahir,
-                  tanggal_lahir,
-                  agama,
-                  pendidikan_id: findPendidikan.id,
-                  pekerjaan_id: newPekerjaan.id,
-                  status,
-                  no_hp,
-                },
-                skipDuplicates: true,
-              });
-
-              return [dataPenduduk, dataKK];
-            }
+          if (!findPekerjaan) {
+            const newPekerjaan = await createPekerjaan(pekerjaan);
 
             const dataKK = await prisma.kartuKeluarga.createMany({
               data: { no_kk, dusun, rt, rw },
@@ -315,37 +463,58 @@ module.exports = {
                 tanggal_lahir,
                 agama,
                 pendidikan_id: findPendidikan.id,
-                pekerjaan_id: findPekerjaan.id,
+                pekerjaan_id: newPekerjaan.id,
                 status,
                 no_hp,
               },
               skipDuplicates: true,
             });
 
-            return [dataPenduduk, dataKK];
-          } catch (error) {
-            throw error;
+            return { dataPenduduk, dataKK };
           }
-        })
-        .on('end', () => {
-          fs.unlink(csvUrl, (err) => {
+
+          const dataKK = await prisma.kartuKeluarga.createMany({
+            data: { no_kk, dusun, rt, rw },
+            skipDuplicates: true,
+          });
+
+          const dataPenduduk = await prisma.penduduk.createMany({
+            data: {
+              no_kk_id: no_kk,
+              namaLengkap,
+              nik,
+              gender,
+              tempat_lahir,
+              tanggal_lahir,
+              agama,
+              pendidikan_id: findPendidikan.id,
+              pekerjaan_id: findPekerjaan.id,
+              status,
+              no_hp,
+            },
+            skipDuplicates: true,
+          });
+
+          return { dataPenduduk, dataKK };
+        } catch (error) {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            const parse = url.parse(csvUrl);
+            fs.unlink(`uploads/${parse.pathname}`, (err) => {
+              if (err) throw err;
+            });
+            return { status: false, code: error.code, meta: error.meta, message: error.message };
+          }
+          const parse = url.parse(csvUrl);
+          fs.unlink(`uploads/${parse.pathname}`, (err) => {
             if (err) throw err;
           });
-        });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        const parse = url.parse(csvUrl);
-        fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          throw error;
+        }
+      })
+      .on('end', () => {
+        fs.unlink(csvUrl, (err) => {
           if (err) throw err;
         });
-        return { status: false, code: error.code, meta: error.meta, message: error.message };
-      }
-      const parse = url.parse(csvUrl);
-      fs.unlink(`uploads/${parse.pathname}`, (err) => {
-        if (err) throw err;
       });
-      throw error;
-    }
-    return null;
   },
 };

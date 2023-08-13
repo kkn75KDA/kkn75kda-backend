@@ -4,16 +4,15 @@ module.exports = {
   statAge: async () => {
     const age = await prisma.$queryRaw`
     SELECT
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 0 AND 5) AS umur_0_5_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 5 AND 11) AS umur_5_11_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 12 AND 16) AS umur_12_16_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 17 AND 25) AS umur_17_25_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 26 AND 35) AS umur_26_35_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 36 AND 45) AS umur_36_45_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 46 AND 55) AS umur_46_55_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 56 AND 65) AS umur_56_65_tahun,
-        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), p.tanggal_lahir)) BETWEEN 65 AND 300) AS umur_65_tahun_keatas;
-  
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 0 AND 5) AS umur_0_5_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 5 AND 11) AS umur_5_11_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 12 AND 16) AS umur_12_16_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 17 AND 25) AS umur_17_25_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 26 AND 35) AS umur_26_35_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 36 AND 45) AS umur_36_45_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 46 AND 55) AS umur_46_55_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 56 AND 65) AS umur_56_65_tahun,
+        (SELECT COUNT(*)::integer FROM "Penduduk" p WHERE EXTRACT(YEAR FROM AGE(NOW(), (p.tanggal_lahir)::DATE)) BETWEEN 65 AND 300) AS umur_65_tahun_keatas;
     `;
 
     return age;

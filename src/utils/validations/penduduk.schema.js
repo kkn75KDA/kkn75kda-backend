@@ -1,15 +1,14 @@
 const Joi = require('joi');
 
 const createPendudukSchema = Joi.object({
-  no_kk_id: Joi.string().required(),
   namaLengkap: Joi.string().required(),
   nik: Joi.string().required(),
   gender: Joi.string().required(),
   tempat_lahir: Joi.string().required(),
   tanggal_lahir: Joi.string().required(),
   agama: Joi.string().required(),
-  pendidikan_id: Joi.number().required(),
-  pekerjaan_id: Joi.number().required(),
+  pendidikan: Joi.string().required(),
+  pekerjaan: Joi.string().required(),
   status: Joi.string().required(),
   no_kk: Joi.string().required(),
   dusun: Joi.string().required(),
@@ -46,15 +45,14 @@ const createPendudukSchema = Joi.object({
 });
 
 const updatePendudukSchema = Joi.object({
-  no_kk_id: Joi.string().optional(),
   namaLengkap: Joi.string().optional(),
   nik: Joi.string().optional(),
   gender: Joi.string().optional(),
   tempat_lahir: Joi.string().optional(),
   tanggal_lahir: Joi.string().optional(),
   agama: Joi.string().optional(),
-  pendidikan_id: Joi.number().optional(),
-  pekerjaan_id: Joi.number().optional(),
+  pendidikan: Joi.string().optional(),
+  pekerjaan: Joi.string().optional(),
   status: Joi.string().optional(),
   no_kk: Joi.string().optional(),
   dusun: Joi.string().optional(),

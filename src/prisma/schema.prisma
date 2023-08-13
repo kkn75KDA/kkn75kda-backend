@@ -59,13 +59,12 @@ model Asset {
 }
 
 model KartuKeluarga {
-  no_kk       String      @id @unique
-  rt          String      @db.VarChar(3)
-  rw          String      @db.VarChar(3)
-  dusun       String      @db.VarChar(300)
-  DataAsset   DataAsset[]
-  pendudukNik String?
-  Penduduk    Penduduk[]
+  no_kk     String      @id @unique
+  rt        String      @db.VarChar(3)
+  rw        String      @db.VarChar(3)
+  dusun     String      @db.VarChar(300)
+  DataAsset DataAsset[]
+  Penduduk  Penduduk[]
 }
 
 model DataAsset {

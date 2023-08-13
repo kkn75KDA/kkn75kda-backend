@@ -68,21 +68,39 @@ module.exports = {
   updateDataAsset: async (id, data) => {
     const { asset, jumlah, penghasilan } = data;
 
-    const findDataAsset = await prisma.dataAsset.findFirst({ where: { no_kk_id: id } });
+    const findDataAsset = await prisma.dataAsset.findFirst({ where: { id: parseInt(id, 10) } });
     const findAsset = await prisma.asset.findFirst({ where: { nama: asset } });
 
     if (!findDataAsset) {
-      return { status: false, message: `Asset data with no.KK ${id} not exist!` };
+      return { status: false, message: `Asset data with id ${id} not exist!` };
     }
 
-    if (!findAsset) {
-      const newAsset = await prisma.asset.create({ data: { nama: asset } });
+    if (findDataAsset.penghasilan !== penghasilan) {
+      await prisma.dataAsset.updateMany({
+        where: { no_kk_id: findDataAsset.no_kk_id },
+        data: { penghasilan },
+      });
+
+      if (!findAsset) {
+        const newAsset = await prisma.asset.create({ data: { nama: asset } });
+
+        const dataAsset = await prisma.dataAsset.update({
+          where: { id: parseInt(id, 10) },
+          data: {
+            no_kk_id: findDataAsset.no_kk_id,
+            asset_id: newAsset.id,
+            jumlah: jumlah || findDataAsset.jumlah,
+          },
+        });
+
+        return dataAsset;
+      }
 
       const dataAsset = await prisma.dataAsset.update({
-        where: { no_kk_id: id },
+        where: { id: parseInt(id, 10) },
         data: {
           no_kk_id: findDataAsset.no_kk_id,
-          asset_id: newAsset.id,
+          asset_id: findAsset.id,
           jumlah: jumlah || findDataAsset.jumlah,
           penghasilan: penghasilan || findDataAsset.penghasilan,
         },
@@ -91,13 +109,29 @@ module.exports = {
       return dataAsset;
     }
 
+    if (!findAsset) {
+      const newAsset = await prisma.asset.create({ data: { nama: asset } });
+
+      const dataAsset = await prisma.dataAsset.update({
+        where: { id: parseInt(id, 10) },
+        data: {
+          no_kk_id: findDataAsset.no_kk_id,
+          asset_id: newAsset.id,
+          jumlah: jumlah || findDataAsset.jumlah,
+          penghasilan: findDataAsset.penghasilan,
+        },
+      });
+
+      return dataAsset;
+    }
+
     const dataAsset = await prisma.dataAsset.update({
-      where: { no_kk_id: id },
+      where: { id: parseInt(id, 10) },
       data: {
         no_kk_id: findDataAsset.no_kk_id,
         asset_id: findAsset.id,
         jumlah: jumlah || findDataAsset.jumlah,
-        penghasilan: penghasilan || findDataAsset.penghasilan,
+        penghasilan: findDataAsset.penghasilan,
       },
     });
 
@@ -105,13 +139,13 @@ module.exports = {
   },
 
   deleteDataAsset: async (id) => {
-    const findDataAsset = await prisma.dataAsset.findUnique({ where: { id } });
+    const findDataAsset = await prisma.dataAsset.findUnique({ where: { id: parseInt(id, 10) } });
 
     if (!findDataAsset) {
       return { status: false, message: `Asset data with id ${id} not exist!` };
     }
 
-    const dataAsset = await prisma.dataAsset.delete({ where: { no_kk_id: id } });
+    const dataAsset = await prisma.dataAsset.delete({ where: { id: parseInt(id, 10) } });
 
     return dataAsset;
   },

@@ -74,9 +74,7 @@ module.exports = {
         return res.status(404).json({ status: false, message: dataAsset.message });
       }
 
-      return res
-        .status(200)
-        .json({ status: true, message: `Asset Data with no.kk ${id} updated!` });
+      return res.status(200).json({ status: true, message: `Asset Data with id ${id} updated!` });
     } catch (error) {
       next(error);
     }

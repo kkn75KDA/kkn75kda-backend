@@ -51,7 +51,7 @@ module.exports = {
     });
 
     if (!findPerangkat) {
-      return { status: false, message: `Perangkat desa with d ${id} not exist!` };
+      return { status: false, message: `Perangkat desa with id ${id} not exist!` };
     }
 
     const perangkat = await prisma.perangkatDesa.delete({ where: { id: parseInt(id, 10) } });

@@ -30,10 +30,8 @@ module.exports = {
 
       const resident = await getPendudukByKK(noKK);
 
-      if (!resident) {
-        return res
-          .status(204)
-          .json({ status: false, message: `Penduduk with no.kk ${noKK} isn't exist!` });
+      if (resident.status === false) {
+        return res.status(404).json({ status: false, message: resident.message });
       }
 
       return res.status(200).json({ status: true, message: 'success', data: { resident } });

@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Agenda" ALTER COLUMN "tanggal" SET DATA TYPE TEXT,
-ALTER COLUMN "waktu" SET DATA TYPE TEXT;

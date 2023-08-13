@@ -59,6 +59,10 @@ module.exports = {
         kk.no_kk = ${noKK}
     `;
 
+    if (resident.length === 0) {
+      return { status: false, message: `Penduduk with No.KK ${noKK} doesn't exist!` };
+    }
+
     return resident;
   },
 
@@ -87,6 +91,8 @@ module.exports = {
       const newPendidikan = await createPendidikan(pekerjaan);
       const newPekerjaan = await createPekerjaan(pekerjaan);
 
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
+
       const penduduk = await prisma.penduduk.create({
         data: {
           no_kk_id: no_kk,
@@ -103,13 +109,13 @@ module.exports = {
         },
       });
 
-      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
-
       return { penduduk, kk };
     }
 
     if (!findPendidikan) {
       const newPendidikan = await createPendidikan(pekerjaan);
+
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
 
       const penduduk = await prisma.penduduk.create({
         data: {
@@ -127,13 +133,13 @@ module.exports = {
         },
       });
 
-      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
-
       return { penduduk, kk };
     }
 
     if (!findPekerjaan) {
       const newPekerjaan = await createPekerjaan(pekerjaan);
+
+      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
 
       const penduduk = await prisma.penduduk.create({
         data: {
@@ -151,10 +157,10 @@ module.exports = {
         },
       });
 
-      const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
-
       return { penduduk, kk };
     }
+
+    const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
 
     const penduduk = await prisma.penduduk.create({
       data: {
@@ -171,8 +177,6 @@ module.exports = {
         no_hp,
       },
     });
-
-    const kk = await prisma.kartuKeluarga.create({ data: { no_kk, dusun, rt, rw } });
 
     return { penduduk, kk };
   },

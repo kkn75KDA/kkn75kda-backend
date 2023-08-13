@@ -50,7 +50,7 @@ module.exports = {
         return { status: false, message: error.details[0].message };
       }
 
-      const perangkat = await updatePerangkatDesa(value, id);
+      const perangkat = await updatePerangkatDesa(id, value);
 
       if (perangkat.status === false) {
         return res.status(404).json({ status: false, message: perangkat.message });

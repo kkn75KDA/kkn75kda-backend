@@ -15,13 +15,23 @@ module.exports = {
   },
 
   createTag: async (data) => {
-    const { nama } = data;
+    if (typeof data === 'object') {
+      const { nama } = data;
 
-    const findTag = await prisma.tag.findFirst({ where: { nama } });
+      const findTag = await prisma.tag.findFirst({ where: { nama } });
+
+      if (findTag) return findTag;
+
+      const tag = await prisma.tag.create({ data: { nama } });
+
+      return tag;
+    }
+
+    const findTag = await prisma.tag.findFirst({ where: { nama: data } });
 
     if (findTag) return findTag;
 
-    const tag = await prisma.tag.create({ data: { nama } });
+    const tag = await prisma.tag.create({ data: { nama: data } });
 
     return tag;
   },

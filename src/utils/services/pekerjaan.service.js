@@ -16,12 +16,22 @@ module.exports = {
   },
 
   createPekerjaan: async (data) => {
-    const { nama } = data;
-    const findPekerjaan = await prisma.pekerjaan.findFirst({ where: { nama } });
+    if (typeof data === 'object') {
+      const { nama } = data;
+      const findPekerjaan = await prisma.pekerjaan.findFirst({ where: { nama } });
+
+      if (findPekerjaan) return findPekerjaan;
+
+      const pekerjaan = await prisma.pekerjaan.create({ data: { nama } });
+
+      return pekerjaan;
+    }
+
+    const findPekerjaan = await prisma.pekerjaan.findFirst({ where: { nama: data } });
 
     if (findPekerjaan) return findPekerjaan;
 
-    const pekerjaan = await prisma.pekerjaan.create({ data: { nama } });
+    const pekerjaan = await prisma.pekerjaan.create({ data: { nama: data } });
 
     return pekerjaan;
   },

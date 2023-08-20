@@ -4,7 +4,7 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllPekerjaan: async () => {
-    const pekerjaan = await prisma.pekerjaan.findMany();
+    const pekerjaan = await prisma.pekerjaan.findMany({ orderBy: { nama: 'asc' } });
 
     return pekerjaan;
   },

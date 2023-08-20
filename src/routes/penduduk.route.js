@@ -5,6 +5,7 @@ const multerMiddleware = require('../middlewares/multer.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
 
 router.get('/', authMiddleware, pendudukController.getAll);
+router.get('/:nik', authMiddleware, pendudukController.getByNIK);
 router.get('/:noKK', authMiddleware, pendudukController.getByKK);
 router.post('/', authMiddleware, pendudukController.create);
 router.post('/import', authMiddleware, multerMiddleware.csv.single('file_penduduk'), pendudukController.importCsv);

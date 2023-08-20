@@ -4,7 +4,7 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllAsset: async () => {
-    const assets = await prisma.asset.findMany();
+    const assets = await prisma.asset.findMany({ orderBy: { nama: 'asc' } });
 
     return assets;
   },

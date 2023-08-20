@@ -16,4 +16,19 @@ module.exports = {
 
     return user;
   },
+
+  getUserByEmailwoPw: async (email) => {
+    const user = await prisma.user.findUnique({
+      select: {
+        id: true,
+        nama: true,
+        email: true,
+      },
+      where: {
+        email,
+      },
+    });
+
+    return user;
+  },
 };

@@ -4,6 +4,7 @@ const agendaController = require('../controllers/agenda.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 
 router.get('/', agendaController.getAll);
+router.get('/:id', agendaController.getById);
 router.post('/', authMiddleware, agendaController.create);
 router.put('/:id', authMiddleware, agendaController.update);
 router.delete('/:id', authMiddleware, agendaController.delete);

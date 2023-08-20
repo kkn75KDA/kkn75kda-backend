@@ -11,7 +11,8 @@ const { createArtikelSchema, updateArtikelSchema } = require('../utils/validatio
 module.exports = {
   getAll: async (req, res, next) => {
     try {
-      const artikels = await getAllArtikel();
+      const { tag } = req.query;
+      const artikels = await getAllArtikel(tag);
 
       return res.status(200).json({ status: true, message: 'success', data: { artikels } });
     } catch (error) {

@@ -1,5 +1,6 @@
 const {
   getAllAgenda,
+  getAgendaById,
   createAgenda,
   updateAgenda,
   deleteAgenda,
@@ -15,6 +16,24 @@ module.exports = {
     } catch (error) {
       next(error);
     }
+    return null;
+  },
+
+  getById: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const agenda = await getAgendaById(id);
+
+      if (!agenda) {
+        return res.status(404).json({ status: false, message: agenda.message });
+      }
+
+      return res.status(200).json({ status: true, message: 'success', data: { agenda } });
+    } catch (error) {
+      next(error);
+    }
+
     return null;
   },
 

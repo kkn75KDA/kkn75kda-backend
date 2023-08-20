@@ -1,7 +1,7 @@
 const path = require('path');
 const {
   getAllPenduduk,
-  getPendudukByKK,
+  getPendudukByNIK,
   createPenduduk,
   importPenduduk,
   updatePenduduk,
@@ -28,7 +28,24 @@ module.exports = {
     try {
       const { noKK } = req.params;
 
-      const resident = await getPendudukByKK(noKK);
+      const resident = await getPendudukByNIK(noKK);
+
+      if (resident.status === false) {
+        return res.status(404).json({ status: false, message: resident.message });
+      }
+
+      return res.status(200).json({ status: true, message: 'success', data: { resident } });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  getByNIK: async (req, res, next) => {
+    try {
+      const { nik } = req.params;
+
+      const resident = await getPendudukByNIK(nik);
 
       if (resident.status === false) {
         return res.status(404).json({ status: false, message: resident.message });

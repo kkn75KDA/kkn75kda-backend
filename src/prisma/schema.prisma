@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -30,21 +30,20 @@ model Pendidikan {
 }
 
 model Penduduk {
-  no_kk         KartuKeluarga   @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
+  no_kk         KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
   no_kk_id      String
-  namaLengkap   String          @db.VarChar(30)
-  nik           String          @id @unique
+  namaLengkap   String        @db.VarChar(30)
+  nik           String        @id @unique
   gender        Gender
-  tempat_lahir  String          @db.VarChar(30)
+  tempat_lahir  String        @db.VarChar(30)
   tanggal_lahir String
-  no_hp         String          @db.VarChar(13)
-  agama         String          @db.VarChar(20)
+  no_hp         String        @db.VarChar(13)
+  agama         String        @db.VarChar(20)
   pendidikan_id Int
-  pendidikan    Pendidikan      @relation(fields: [pendidikan_id], references: [id])
+  pendidikan    Pendidikan    @relation(fields: [pendidikan_id], references: [id])
   pekerjaan_id  Int
-  pekerjaan     Pekerjaan       @relation(fields: [pekerjaan_id], references: [id])
+  pekerjaan     Pekerjaan     @relation(fields: [pekerjaan_id], references: [id])
   status        String
-  PerangkatDesa PerangkatDesa[]
 }
 
 enum Gender {
@@ -71,9 +70,9 @@ model DataAsset {
   id          Int           @id @default(autoincrement())
   no_kk       KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
   no_kk_id    String
-  asset       Asset         @relation(fields: [asset_id], references: [id])
-  asset_id    Int
-  jumlah      String        @db.VarChar(30)
+  asset       Asset?        @relation(fields: [asset_id], references: [id])
+  asset_id    Int?
+  jumlah      String?       @db.VarChar(30)
   penghasilan String
 }
 
@@ -90,16 +89,15 @@ model Artikel {
   isi       String   @db.Text
   tag_id    Int
   tag       Tag      @relation(fields: [tag_id], references: [id])
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @db.Timestamp()
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model PerangkatDesa {
-  id      Int      @id @default(autoincrement())
-  nik_id  String
-  nik     Penduduk @relation(fields: [nik_id], references: [nik])
+  id      Int    @id @default(autoincrement())
+  nama    String
   photo   String
-  jabatan String   @db.VarChar(30)
+  jabatan String @db.VarChar(30)
 }
 
 model Agenda {

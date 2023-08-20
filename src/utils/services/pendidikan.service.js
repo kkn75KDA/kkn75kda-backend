@@ -4,7 +4,7 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllPendidikan: async () => {
-    const pendidikan = await prisma.pendidikan.findMany();
+    const pendidikan = await prisma.pendidikan.findMany({ orderBy: { nama: 'asc' } });
 
     return pendidikan;
   },

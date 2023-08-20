@@ -17,9 +17,10 @@ const indexRouter = require('./routes');
 // Middleware
 app.use(rateLimit(limiterHandler));
 app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(
   cors({
-    origin: FE_ORIGIN || 'http://localhost:3000',
+    origin: FE_ORIGIN || 'http://localhost:5173',
     credentials: true,
     // eslint-disable-next-line comma-dangle
   })

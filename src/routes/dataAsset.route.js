@@ -5,7 +5,7 @@ const multerMiddleware = require('../middlewares/multer.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
 
 router.get('/', authMiddleware, dataAssetController.getAll);
-router.get('/:id', authMiddleware, dataAssetController.getByKK);
+router.get('/:id', authMiddleware, dataAssetController.getById);
 router.post('/', authMiddleware, dataAssetController.create);
 router.put('/:id', authMiddleware, dataAssetController.update);
 router.delete('/:id', authMiddleware, dataAssetController.delete);

@@ -6,7 +6,7 @@ const {
 } = require('../utils/validations/dataAsset.schema');
 const {
   getAllDataAsset,
-  getDataAssetByKK,
+  getDataAssetById,
   createDataAsset,
   updateDataAsset,
   deleteDataAsset,
@@ -25,11 +25,11 @@ module.exports = {
     return null;
   },
 
-  getByKK: async (req, res, next) => {
+  getById: async (req, res, next) => {
     try {
       const { id } = req.params;
 
-      const dataAsset = await getDataAssetByKK(id);
+      const dataAsset = await getDataAssetById(id);
 
       if (dataAsset.status === false) {
         return res.status(404).json({ status: false, message: dataAsset.message });

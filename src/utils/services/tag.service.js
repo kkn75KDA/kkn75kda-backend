@@ -2,7 +2,7 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllTag: async () => {
-    const tags = await prisma.tag.findMany();
+    const tags = await prisma.tag.findMany({ orderBy: { nama: 'asc' } });
 
     return tags;
   },

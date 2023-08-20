@@ -1,5 +1,6 @@
 const {
   getAllPerangkatDesa,
+  getPerangkatDesaById,
   createPerangkatDesa,
   updatePerangkatDesa,
   deletePerangkat,
@@ -16,6 +17,23 @@ module.exports = {
       const perangkatDesa = await getAllPerangkatDesa();
 
       return res.status(200).json({ status: true, message: 'success!', data: { perangkatDesa } });
+    } catch (error) {
+      next(error);
+    }
+    return null;
+  },
+
+  getById: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const perangkatDesa = await getPerangkatDesaById(id);
+
+      if (perangkatDesa.status === false) {
+        return res.status(404).json({ status: false, message: perangkatDesa.message });
+      }
+
+      return res.status(200).json({ status: true, message: 'success', data: { perangkatDesa } });
     } catch (error) {
       next(error);
     }
@@ -43,7 +61,12 @@ module.exports = {
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
-      req.body.photo = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      if (!req.file) {
+        const getPerangkat = await getPerangkatDesaById(id);
+        req.body.photo = getPerangkat.photo;
+      } else {
+        req.body.photo = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      }
       const { error, value } = updatePerangkatDesaSchema.validate(req.body);
 
       if (error) {

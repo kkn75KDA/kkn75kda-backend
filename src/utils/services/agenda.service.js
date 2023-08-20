@@ -2,7 +2,17 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllAgenda: async () => {
-    const agenda = await prisma.agenda.findMany();
+    const agenda = await prisma.agenda.findMany({ orderBy: { tanggal: 'asc' } });
+
+    return agenda;
+  },
+
+  getAgendaById: async (id) => {
+    const agenda = await prisma.agenda.findUnique({ where: { id: parseInt(id, 10) } });
+
+    if (!agenda) {
+      return { status: false, message: `Agenda with id ${id} not exist!` };
+    }
 
     return agenda;
   },

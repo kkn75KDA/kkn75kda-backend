@@ -2,7 +2,6 @@
 /* eslint-disable no-useless-catch */
 const fs = require('fs');
 const csv = require('fast-csv');
-const url = require('url');
 const { Prisma } = require('@prisma/client');
 
 const prisma = require('../libs/prisma.config');
@@ -13,14 +12,16 @@ module.exports = {
   getAllDataAsset: async () => {
     const assets = await prisma.dataAsset.findMany({
       include: { asset: { select: { nama: true } } },
+      orderBy: { no_kk_id: 'asc' },
     });
 
     return assets;
   },
 
-  getDataAssetByKK: async (no_kk) => {
+  getDataAssetById: async (id) => {
     const asset = await prisma.dataAsset.findMany({
       select: {
+        id: true,
         no_kk_id: true,
         jumlah: true,
         asset: {
@@ -30,13 +31,13 @@ module.exports = {
         },
         penghasilan: true,
       },
-      where: { no_kk_id: no_kk },
+      where: { id: parseInt(id, 10) },
     });
 
     if (!asset) {
       return {
         status: false,
-        message: `Asset data ${no_kk} not exist!`,
+        message: `Asset data ${id} not exist!`,
       };
     }
 
@@ -164,6 +165,21 @@ module.exports = {
 
           const findAsset = await getAssetByName(asset);
 
+          if (asset === '') {
+            const findAssetNull = await getAssetByName('-');
+            const dataAsset = await prisma.dataAsset.createMany({
+              data: {
+                no_kk_id: no_kk,
+                asset_id: findAssetNull.id,
+                jumlah: '-',
+                penghasilan,
+              },
+              skipDuplicates: true,
+            });
+
+            return dataAsset;
+          }
+
           if (!findAsset) {
             const newAsset = await createAsset(asset);
 
@@ -188,22 +204,24 @@ module.exports = {
           return dataAsset;
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            const parse = url.parse(csvUrl);
-            fs.unlink(`uploads/${parse.pathname}`, (err) => {
+            fs.unlink(csvUrl, (err) => {
               if (err) throw err;
             });
             return { status: false, code: error.code, meta: error.meta, message: error.message };
           }
-          const parse = url.parse(csvUrl);
-          fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          fs.unlink(csvUrl, (err) => {
             if (err) throw err;
           });
           throw error;
         }
       })
       .on('end', () => {
-        fs.unlink(csvUrl, (err) => {
-          if (err) throw err;
+        fs.exists(csvUrl, (exist) => {
+          if (exist) {
+            fs.unlink(csvUrl, (err) => {
+              if (err) throw err;
+            });
+          }
         });
       });
   },

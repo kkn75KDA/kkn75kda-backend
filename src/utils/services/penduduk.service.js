@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-catch */
 /* eslint-disable camelcase */
 const fs = require('fs');
-const url = require('url');
 const csv = require('fast-csv');
 const { Prisma } = require('@prisma/client');
 
@@ -13,7 +12,7 @@ module.exports = {
   getAllPenduduk: async () => {
     const residents = await prisma.$queryRaw`
     SELECT
-        p."namaLengkap",
+        p.namaLengkap,
         p.nik,
         p.gender,
         p.tempat_lahir,
@@ -26,10 +25,11 @@ module.exports = {
         kk.dusun,
         kk.rt,
         kk.rw
-    FROM "Penduduk" p 
-    Inner JOIN "Pendidikan" p2 ON p.pendidikan_id = p2.id 
-    Inner JOIN "Pekerjaan" p3 ON p.pekerjaan_id = p3.id
-    Inner JOIN "KartuKeluarga" kk ON p.no_kk_id = kk.no_kk 
+    FROM Penduduk p 
+    INNER JOIN Pendidikan p2 ON p.pendidikan_id = p2.id 
+    INNER JOIN Pekerjaan p3 ON p.pekerjaan_id = p3.id
+    INNER JOIN KartuKeluarga kk ON p.no_kk_id = kk.no_kk
+    ORDER BY namaLengkap ASC 
     `;
 
     return residents;
@@ -38,7 +38,7 @@ module.exports = {
   getPendudukByKK: async (noKK) => {
     const resident = await prisma.$queryRaw`
     SELECT
-            p."namaLengkap",
+            p.namaLengkap,
             p.nik,
             p.gender,
             p.tempat_lahir,
@@ -51,16 +51,49 @@ module.exports = {
             kk.dusun,
             kk.rt,
             kk.rw
-    FROM "Penduduk" p 
-    INNER JOIN "Pendidikan" p2 ON p.pendidikan_id = p2.id 
-    INNER JOIN "Pekerjaan" p3 ON p.pekerjaan_id = p3.id
-    INNER JOIN "KartuKeluarga" kk ON p.no_kk_id = kk.no_kk
+    FROM Penduduk p 
+    INNER JOIN Pendidikan p2 ON p.pendidikan_id = p2.id 
+    INNER JOIN Pekerjaan p3 ON p.pekerjaan_id = p3.id
+    INNER JOIN KartuKeluarga kk ON p.no_kk_id = kk.no_kk
     WHERE
         kk.no_kk = ${noKK}
+    ORDER BY namaLengkap ASC
     `;
 
     if (resident.length === 0) {
       return { status: false, message: `Penduduk with No.KK ${noKK} doesn't exist!` };
+    }
+
+    return resident;
+  },
+
+  getPendudukByNIK: async (NIK) => {
+    const resident = await prisma.$queryRaw`
+    SELECT
+            p.namaLengkap,
+            p.nik,
+            p.gender,
+            p.tempat_lahir,
+            p.tanggal_lahir,
+            p.agama,
+            p2.nama AS pendidikan,
+            p3.nama AS pekerjaan,
+            p.status,
+            kk.no_kk,
+            kk.dusun,
+            kk.rt,
+            kk.rw
+    FROM Penduduk p 
+    INNER JOIN Pendidikan p2 ON p.pendidikan_id = p2.id 
+    INNER JOIN Pekerjaan p3 ON p.pekerjaan_id = p3.id
+    INNER JOIN KartuKeluarga kk ON p.no_kk_id = kk.no_kk
+    WHERE
+        p.nik = ${NIK}
+    ORDER BY namaLengkap ASC
+    `;
+
+    if (resident.length === 0) {
+      return { status: false, message: `Penduduk with NIK ${NIK} doesn't exist!` };
     }
 
     return resident;
@@ -502,22 +535,24 @@ module.exports = {
           return { dataPenduduk, dataKK };
         } catch (error) {
           if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            const parse = url.parse(csvUrl);
-            fs.unlink(`uploads/${parse.pathname}`, (err) => {
+            fs.unlink(csvUrl, (err) => {
               if (err) throw err;
             });
             return { status: false, code: error.code, meta: error.meta, message: error.message };
           }
-          const parse = url.parse(csvUrl);
-          fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          fs.unlink(csvUrl, (err) => {
             if (err) throw err;
           });
           throw error;
         }
       })
       .on('end', () => {
-        fs.unlink(csvUrl, (err) => {
-          if (err) throw err;
+        fs.exists(csvUrl, (exist) => {
+          if (exist) {
+            fs.unlink(csvUrl, (err) => {
+              if (err) throw err;
+            });
+          }
         });
       });
   },

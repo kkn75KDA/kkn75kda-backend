@@ -6,23 +6,27 @@ const prisma = require('../libs/prisma.config');
 
 module.exports = {
   getAllPerangkatDesa: async () => {
-    const perangkatDesa = await prisma.$queryRaw`
-    SELECT
-      pd.id,
-      p."namaLengkap",
-      pd.photo,
-      pd.jabatan 
-    FROM "PerangkatDesa" pd 
-    INNER JOIN "Penduduk" p ON pd.nik_id = p.nik 
-    `;
+    const perangkatDesa = await prisma.perangkatDesa.findMany({ orderBy: { nama: 'asc' } });
+
+    return perangkatDesa;
+  },
+
+  getPerangkatDesaById: async (id) => {
+    const perangkatDesa = await prisma.perangkatDesa.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!perangkatDesa) {
+      return { status: false, message: `Perangkat Desa with id ${id} not exist!` };
+    }
 
     return perangkatDesa;
   },
 
   createPerangkatDesa: async (data) => {
-    const { nik_id, photo, jabatan } = data;
+    const { nama, photo, jabatan } = data;
 
-    const perangkat = await prisma.perangkatDesa.create({ data: { nik_id, photo, jabatan } });
+    const perangkat = await prisma.perangkatDesa.create({ data: { nama, photo, jabatan } });
 
     return perangkat;
   },
@@ -37,9 +41,17 @@ module.exports = {
     }
 
     const perangkat = await prisma.perangkatDesa.update({ where: { id: parseInt(id, 10) }, data });
+
+    if (data.photo === findPerangkat.photo) {
+      return perangkat;
+    }
     const parse = url.parse(findPerangkat.photo);
-    fs.unlink(`uploads/${parse.pathname}`, (err) => {
-      if (err) throw err;
+    fs.exists(`uploads/${parse.pathname}`, (exist) => {
+      if (exist) {
+        fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          if (err) throw err;
+        });
+      }
     });
 
     return perangkat;
@@ -56,8 +68,12 @@ module.exports = {
 
     const perangkat = await prisma.perangkatDesa.delete({ where: { id: parseInt(id, 10) } });
     const parse = url.parse(findPerangkat.photo);
-    fs.unlink(`uploads/${parse.pathname}`, (err) => {
-      if (err) throw err;
+    fs.exists(`uploads/${parse.pathname}`, (exist) => {
+      if (exist) {
+        fs.unlink(`uploads/${parse.pathname}`, (err) => {
+          if (err) throw err;
+        });
+      }
     });
 
     return perangkat;

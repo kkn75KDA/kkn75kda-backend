@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,43 +11,39 @@ model User {
   id        Int      @id @default(autoincrement())
   nama      String   @db.VarChar(30)
   email     String   @unique
-  password  String   @db.VarChar(20)
+  password  String
+  avatar    String   @default("https://ik.imagekit.io/qlxmzsojb/KKN75/user.png?updatedAt=1690285305263")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
 
 model Pekerjaan {
   id       Int        @id @default(autoincrement())
-  nama     String     @db.VarChar(30)
+  nama     String     @unique @db.VarChar(30)
   Penduduk Penduduk[]
 }
 
 model Pendidikan {
   id       Int        @id @default(autoincrement())
-  nama     String     @db.VarChar(30)
+  nama     String     @unique @db.VarChar(30)
   Penduduk Penduduk[]
 }
 
 model Penduduk {
-  nik           String          @id @unique
-  no_kk         String
-  nama          String          @db.VarChar(30)
+  no_kk         KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
+  no_kk_id      String
+  namaLengkap   String        @db.VarChar(30)
+  nik           String        @id @unique
   gender        Gender
-  tempat_lahir  String
+  tempat_lahir  String        @db.VarChar(30)
   tanggal_lahir String
-  alamat        String          @db.Text
-  rt            String          @db.VarChar(3)
-  rw            String          @db.VarChar(3)
-  desa          String
-  kecamatan     String
-  no_hp         String          @db.VarChar(13)
-  agama         String
+  no_hp         String        @db.VarChar(13)
+  agama         String        @db.VarChar(20)
   pendidikan_id Int
-  pendidikan    Pendidikan      @relation(fields: [pendidikan_id], references: [id])
+  pendidikan    Pendidikan    @relation(fields: [pendidikan_id], references: [id])
   pekerjaan_id  Int
-  pekerjaan     Pekerjaan       @relation(fields: [pekerjaan_id], references: [id])
+  pekerjaan     Pekerjaan     @relation(fields: [pekerjaan_id], references: [id])
   status        String
-  PerangkatDesa PerangkatDesa[]
 }
 
 enum Gender {
@@ -55,32 +51,59 @@ enum Gender {
   P
 }
 
+model Asset {
+  id        Int         @id @default(autoincrement())
+  nama      String      @unique @db.VarChar(50)
+  DataAsset DataAsset[]
+}
+
+model KartuKeluarga {
+  no_kk     String      @id @unique
+  rt        String      @db.VarChar(3)
+  rw        String      @db.VarChar(3)
+  dusun     String      @db.VarChar(300)
+  DataAsset DataAsset[]
+  Penduduk  Penduduk[]
+}
+
+model DataAsset {
+  id          Int           @id @default(autoincrement())
+  no_kk       KartuKeluarga @relation(fields: [no_kk_id], references: [no_kk], onDelete: Cascade, onUpdate: Cascade)
+  no_kk_id    String
+  asset       Asset?        @relation(fields: [asset_id], references: [id])
+  asset_id    Int?
+  jumlah      String?       @db.VarChar(30)
+  penghasilan String
+}
+
 model Tag {
-  id      Int       @id
-  nama    String
+  id      Int       @id @default(autoincrement())
+  nama    String    @unique @db.VarChar(30)
   Artikel Artikel[]
 }
 
 model Artikel {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   thumbnail String
-  judul     String
-  Isi       String @db.Text
+  judul     String   @db.VarChar(40)
+  isi       String   @db.Text
   tag_id    Int
-  tag       Tag    @relation(fields: [tag_id], references: [id])
-}
-
-model Jabatan {
-  id            Int             @id @default(autoincrement())
-  nama          String
-  PerangkatDesa PerangkatDesa[]
+  tag       Tag      @relation(fields: [tag_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model PerangkatDesa {
-  id         Int      @id @default(autoincrement())
-  nik_id     String
-  nik        Penduduk @relation(fields: [nik_id], references: [nik])
-  photo      String
-  jabatan_id Int
-  jabatan    Jabatan  @relation(fields: [jabatan_id], references: [id])
+  id      Int    @id @default(autoincrement())
+  nama    String
+  photo   String
+  jabatan String @db.VarChar(30)
+}
+
+model Agenda {
+  id      Int    @id @default(autoincrement())
+  judul   String @db.VarChar(50)
+  tempat  String @db.VarChar(50)
+  tanggal String
+  waktu   String
 }

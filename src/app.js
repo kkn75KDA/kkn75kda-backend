@@ -3,11 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
 const cookieparser = require('cookie-parser');
 
 const app = express();
-const { PORT } = process.env;
+const { PORT, FE_ORIGIN, NODE_ENV } = process.env;
 
 // Local
 const { notFoundHandler, errorHandler, limiterHandler } = require('./middlewares');
@@ -15,9 +16,11 @@ const indexRouter = require('./routes');
 
 // Middleware
 app.use(rateLimit(limiterHandler));
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(
   cors({
-    origin: process.env.FE_ORIGIN || 'http://localhost:3000',
+    origin: FE_ORIGIN || 'http://localhost:5173',
     credentials: true,
     // eslint-disable-next-line comma-dangle
   })
@@ -25,7 +28,11 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieparser());
-app.use(morgan('dev'));
+app.use('/images', express.static('uploads/images'));
+
+if (NODE_ENV === 'dev') {
+  app.use(morgan('dev'));
+}
 
 // Route
 app.use(indexRouter);
